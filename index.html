@@ -226,14 +226,37 @@
         ];
 
         const dailyChallenges = [
-            "Hoy pídele al del jugo que NO te dé pitillo.",
+            "Desconecta todos los aparatos electrónicos que no estés usando (cargadores, microondas, consolas en stand-by).",
             "Revisa qué ropa no usas y sepárala para regalar o vender.",
-            "Báñate en lo que dura una canción (aprox. 4 min).",
+            "Intenta bañarte en lo que dura tu canción favorita (aprox. 3-4 minutos) para ahorrar agua caliente y gas/energía.",
             "Ve a la tienda o supermercado con tu propia bolsa de tela.",
             "Ese cajón que no cierra bien... ¡arréglalo hoy!",
             "Haz un 'calentado' con lo que sobró del almuerzo de ayer.",
             "Desenchufa el cargador del celular si no lo estás usando.",
-            "Averigua qué día pasa el camión del reciclaje en tu barrio."
+            "Reduce el brillo de tu monitor y celular al nivel mínimo cómodo para ahorrar batería y energía.",
+            "Al cepillarte los dientes o enabonarte las manos, cierra la llave. No dejes correr el agua.",
+            "Revisa los grifos y el inodoro de tu casa. Si ves una gota, ¡arréglala hoy!",
+            "Si lavas frutas o verduras, usa un recipiente y luego usa esa misma agua para regar las plantas.",
+            "No pongas la lavadora si no está llena. Espera a acumular suficiente ropa para aprovechar el ciclo.",
+            "Hoy rechaza cualquier pitillo (popote), bolsa o botella de plástico. Lleva tu propia botella y bolsa.",
+            "Intenta que tu almuerzo no genere residuos no reciclables (usa tupper, cubiertos de metal y servilleta de tela).",
+            "Tómate 10 minutos para verificar si estás separando bien la basura en casa. ¿El reciclaje está limpio y seco?",
+            "Si tienes que comprar comida hoy, intenta comprar al menos un producto sin empaque (fruta suelta, granos a granel).",
+            "Rellena tu propia botella de agua todo el día. No compres agua embotellada.",
+            "Intenta pasar todo el día sin consumir proteína animal. Reduce tu huella de carbono significativamente.",
+            "Investiga qué frutas o verduras están en temporada en tu región y compra una de ellas.",
+            "Crea un plato creativo usando solo lo que ya tienes en la nevera antes de que se dañe. ¡Cero desperdicio de comida!",
+            "Si tomas café fuera, lleva tu propio termo. Si lo haces en casa, usa filtros reutilizables o prensa francesa.",
+            "Antes de comprar algo, mira de dónde viene. Si viajó miles de kilómetros, busca una opción más cercana.",
+            "Si vas a un lugar que está a menos de 2 km, ve caminando o en bicicleta en lugar de usar el carro o transporte público.",
+            "Evita el ascensor hoy. Ahorras energía del edificio y haces ejercicio.",
+            "Si tienes espacio, planta una semilla o cuida las plantas que ya tienes. Si no, riega un árbol de tu calle (si es necesario).",
+            "Si ves un papel o plástico en la calle mientras caminas, recógelo y tíralo en la caneca correcta.",
+            "Lee un artículo corto sobre un problema ambiental local de tu ciudad.",
+            "Busca en tu armario una prenda que no uses y sepárala para donar, en lugar de tirarla.",
+            "Si tienes que imprimir o escribir, asegúrate de usar ambas caras de la hoja.",
+            "Tómate un momento para apreciar la naturaleza que te rodea (un parque, el cielo, un árbol). La conexión es el primer paso para cuidar.",
+            "Entrégale el reciclaje al reciclador de tu barrio."
         ];
 
         // --- LOGICA DEL ARBOL DE DECISIÓN (WIZARD) ---
@@ -296,31 +319,31 @@
                 {
                     title: "Colombia Sostenible",
                     subtitle: "Nuestra biodiversidad depende de lo que hagas hoy.",
-                    image: "https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&w=1600&q=80",
+                    image: "https://images.unsplash.com/photo-1536308037887-165852797016?auto=format&fit=crop&w=1600&q=80",
                     color: "from-emerald-900/80 to-transparent"
                 },
                 {
                     title: "¿Basura o Tesoro?",
                     subtitle: "Aprende a diferenciar antes de botar.",
-                    image: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=1600&q=80",
+                    image: "https://images.unsplash.com/photo-1683063005230-ec93739b6dd8?auto=format&fit=crop&w=1600&q=80",
                     color: "from-blue-900/80 to-transparent"
                 },
                 {
                     title: "Compra Local",
                     subtitle: "Apoya a nuestros campesinos y reduce empaques.",
-                    image: "https://images.unsplash.com/photo-1591191071477-4482d8c9735a?auto=format&fit=crop&w=1600&q=80",
+                    image: "https://images.unsplash.com/photo-1686285540093-0613f74311dd?auto=format&fit=crop&w=1600&q=80",
                     color: "from-orange-900/80 to-transparent"
                 },
                 {
                     title: "Cuida el Agua",
                     subtitle: "Cada gota cuenta en nuestros páramos.",
-                    image: "https://images.unsplash.com/photo-1544473244-f6895e6e9b44?auto=format&fit=crop&w=1600&q=80",
+                    image: "https://images.unsplash.com/photo-1694475614339-a0adc86836d8?auto=format&fit=crop&w=1600&q=80",
                     color: "from-cyan-900/80 to-transparent"
                 },
                 {
                     title: "Sin Plástico",
                     subtitle: "Lleva tu talego, rechaza el pitillo.",
-                    image: "https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?auto=format&fit=crop&w=1600&q=80",
+                    image: "https://images.unsplash.com/photo-1661642056539-60fe43d29739?auto=format&fit=crop&w=1600&q=80",
                     color: "from-green-900/80 to-transparent"
                 },
                 {
@@ -464,7 +487,7 @@
                                     <div className="bg-yellow-100 p-2 rounded-lg text-yellow-600">
                                         <Icons.Zap size={24} className="fill-current" />
                                     </div>
-                                    <h3 className="text-2xl font-bold text-slate-800">Reto Eco-Diario</h3>
+                                    <h3 className="text-2xl font-bold text-slate-800">Retos ecológicos cotidianos</h3>
                                 </div>
                                 <p className="text-xl text-slate-600 mb-6 leading-relaxed">
                                     {dailyChallenge ? dailyChallenge : "¿Te le mides a un reto sostenible hoy?"}
@@ -486,7 +509,7 @@
                                 <span className="text-white/80 text-xs font-bold uppercase tracking-widest mb-2">Dato de Impacto</span>
                                 <h4 className="text-5xl font-black mb-1">12M</h4>
                                 <p className="font-medium text-lg opacity-95 leading-tight mb-2">Toneladas de basura al año en Colombia.</p>
-                                <p className="text-sm bg-white/20 p-2 rounded-lg mt-2 inline-block backdrop-blur-sm">Solo reciclamos el 17%.</p>
+                                <p className="text-sm bg-white/20 p-2 rounded-lg mt-2 inline-block backdrop-blur-sm">¡Solo reciclamos el 17%!</p>
                             </div>
                         </div>
 
@@ -520,7 +543,7 @@
                                     <>
                                         <div className="flex flex-col lg:flex-row items-end justify-between mb-10 gap-6">
                                         <div className="text-left max-w-2xl">
-                                            <h2 className="text-4xl font-black text-slate-800 mb-4 tracking-tight">La Escalera de la Sostenibilidad</h2>
+                                            <h2 className="text-4xl font-black text-slate-800 mb-4 tracking-tight">La Escalera de la Sostenibilidad (Economía circular)</h2>
                                             <p className="text-slate-500 text-lg leading-relaxed">Cada paso cuenta. Empieza desde arriba (Rechazar) y ve bajando hasta llegar al reciclaje solo si es necesario.</p>
                                         </div>
                                         
