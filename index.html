@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eco-Brújula 9R | Colombia Sostenible</title>
+    <title>Colombia Sostenible</title>
     
     <!-- React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -23,6 +23,8 @@
         /* Animaciones personalizadas */
         .animate-in { animation: fadeIn 0.5s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .slide-up { animation: slideUp 0.4s ease-out forwards; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
@@ -32,7 +34,6 @@
         const { useState, useEffect } = React;
 
         // --- ICONOS (LUCIDE REPLICA) ---
-        // Definimos los iconos como componentes SVG para evitar dependencias externas complejas
         const Icons = {
             ArrowRight: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>,
             RotateCcw: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>,
@@ -59,7 +60,8 @@
             Check: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="20 6 9 17 4 12"/></svg>,
             Star: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
             HelpCircle: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>,
-            MapPin: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            MapPin: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>,
+            Brain: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>
         };
 
         // --- DATOS PRINCIPALES (CONTEXTO COLOMBIA) ---
@@ -225,6 +227,170 @@
             }
         ];
 
+        // --- DATOS TRIVIA (20 PREGUNTAS) ---
+        const triviaData = [
+            {
+                id: 1,
+                question: "Acabas de comerte una pizza y la caja está llena de grasa. ¿Dónde la botas?",
+                options: ["Bolsa Blanca (Reciclable)", "Bolsa Negra (No Aprovechable)", "Bolsa Verde (Orgánico)"],
+                correct: 1,
+                feedback: "¡Correcto! El cartón engrasado pierde su capacidad de reciclaje. Debe ir a la bolsa negra.",
+                wrongFeedback: "¡Ojo! La grasa contamina el cartón y daña el reciclaje. Va a la bolsa negra."
+            },
+            {
+                id: 2,
+                question: "¿Qué debes hacer con el aceite de cocina usado?",
+                options: ["Botarlo por el sifón con agua caliente", "Echarlo a la tierra", "Guardarlo en una botella y llevarlo a un punto de recolección"],
+                correct: 2,
+                feedback: "¡Excelente! 1 litro de aceite contamina 1.000 litros de agua. ¡Nunca al sifón!",
+                wrongFeedback: "¡Pilas! El aceite tapa tuberías y contamina ríos. Guárdalo y busca un punto de recolección."
+            },
+            {
+                id: 3,
+                question: "¿Cuál es el color de bolsa para los residuos orgánicos (cáscaras, sobras) en Colombia?",
+                options: ["Verde", "Azul", "Gris"],
+                correct: 0,
+                feedback: "¡Así es! La bolsa verde es para residuos orgánicos aprovechables.",
+                wrongFeedback: "Incorrecto. Según el código de colores, la bolsa VERDE es para orgánicos."
+            },
+            {
+                id: 4,
+                question: "Tienes una botella plástica. ¿Paso correcto antes de botarla?",
+                options: ["Botarla tal cual a la negra", "Lavar, secar, aplastar -> Bolsa Blanca", "Llenarla de basura"],
+                correct: 1,
+                feedback: "¡Muy bien! Limpio, Seco y Aplastado es la regla de oro.",
+                wrongFeedback: "Para que se aproveche, debe estar limpia y seca en la bolsa blanca."
+            },
+            {
+                id: 5,
+                question: "¿Qué significa la primera R de la economía circular?",
+                options: ["Reciclar", "Reutilizar", "Rechazar"],
+                correct: 2,
+                feedback: "¡Esa es la actitud! Rechazar lo innecesario es lo más importante.",
+                wrongFeedback: "La primera y más importante es RECHAZAR el residuo desde el inicio."
+            },
+            {
+                id: 6,
+                question: "¿Qué haces con medicamentos vencidos o que ya no usas?",
+                options: ["Bolsa Negra", "Inodoro", "Puntos Azules en droguerías/supermercados"],
+                correct: 2,
+                feedback: "¡Exacto! Los Puntos Azules garantizan su destrucción segura sin contaminar aguas.",
+                wrongFeedback: "Nunca a la basura ni al agua. Busca los contenedores 'Punto Azul'."
+            },
+            {
+                id: 7,
+                question: "¿Dónde se botan las pilas AA o AAA?",
+                options: ["Bolsa Blanca", "Bolsa Negra", "Contenedores 'Pilas con el Ambiente'"],
+                correct: 2,
+                feedback: "¡Correcto! Las pilas tienen metales pesados y requieren gestión especial.",
+                wrongFeedback: "¡Peligro! Las pilas contaminan mucho. Llévalas a puntos de recolección en centros comerciales."
+            },
+            {
+                id: 8,
+                question: "¿El icopor sucio de comida dónde va?",
+                options: ["Bolsa Blanca", "Bolsa Negra", "Bolsa Verde"],
+                correct: 1,
+                feedback: "Lamentablemente, el icopor sucio es muy difícil de recuperar. Va a la negra.",
+                wrongFeedback: "Al estar sucio pierde valor. Debe ir a la bolsa negra de no aprovechables."
+            },
+            {
+                id: 9,
+                question: "¿Cómo reciclar cajas de Tetra Pak (leche/jugos)?",
+                options: ["Bolsa Negra directo", "Escurrir, aplastar y Bolsa Blanca", "Quemar en el patio"],
+                correct: 1,
+                feedback: "¡Sí! El Tetra Pak se recicla para hacer mobiliario escolar y techos.",
+                wrongFeedback: "Son reciclables si están escurridos y aplastados en la bolsa blanca."
+            },
+            {
+                id: 10,
+                question: "Se rompió un espejo o un vaso de cerámica. ¿Dónde va?",
+                options: ["Bolsa Blanca (Vidrio)", "Bolsa Negra (envuelto en periódico)", "Suelo"],
+                correct: 1,
+                feedback: "¡Ojo! Espejos y cerámica NO son vidrio reciclable. Van a la negra, envueltos por seguridad.",
+                wrongFeedback: "No se reciclan con el vidrio de botellas. Van a la negra, envueltos para no cortar al recolector."
+            },
+            {
+                id: 11,
+                question: "¿Qué hacer con bombillos ahorradores o tubos fluorescentes?",
+                options: ["Bolsa Negra con cuidado", "Puntos de recolección Lumina/Posconsumo", "Bolsa Blanca"],
+                correct: 1,
+                feedback: "¡Bien! Contienen mercurio y necesitan disposición especial.",
+                wrongFeedback: "Tienen mercurio peligroso. No van a la basura normal. Busca puntos Lumina."
+            },
+            {
+                id: 12,
+                question: "¿Cuál es uno de los mayores impactos del 'Fast Fashion' (Moda Rápida)?",
+                options: ["Ninguno", "Consumo excesivo de agua y contaminación", "Mejora el aire"],
+                correct: 1,
+                feedback: "Correcto. La industria textil es de las más contaminantes del mundo.",
+                wrongFeedback: "La moda rápida gasta muchísima agua y genera microplásticos."
+            },
+            {
+                id: 13,
+                question: "¿Cuánto tarda aprox. una botella de plástico en descomponerse?",
+                options: ["1 año", "50 años", "Hasta 500 años"],
+                correct: 2,
+                feedback: "Triste pero cierto. Por eso es vital Rechazar y Reducir.",
+                wrongFeedback: "Es mucho más... cerca de 500 años persistiendo en el ambiente."
+            },
+            {
+                id: 14,
+                question: "¿Dónde van las colillas de cigarrillo?",
+                options: ["Al suelo", "Bolsa Blanca", "Bolsa Negra (bien apagadas)"],
+                correct: 2,
+                feedback: "¡Sí! Son residuos peligrosos no aprovechables. Nunca al suelo.",
+                wrongFeedback: "Van a la bolsa negra. Una sola colilla contamina litros de agua."
+            },
+            {
+                id: 15,
+                question: "Papel higiénico, servilletas usadas y pañales. ¿Bolsa?",
+                options: ["Bolsa Negra", "Bolsa Verde", "Bolsa Blanca"],
+                correct: 0,
+                feedback: "Correcto. Son residuos sanitarios no aprovechables.",
+                wrongFeedback: "Estos siempre van a la bolsa negra (residuos ordinarios/sanitarios)."
+            },
+            {
+                id: 16,
+                question: "¿Qué es un RAEE?",
+                options: ["Un pájaro", "Residuo de Aparatos Eléctricos y Electrónicos", "Una marca de jabón"],
+                correct: 1,
+                feedback: "Así es. Computadores, neveras, secadores... tienen gestión diferenciada.",
+                wrongFeedback: "Significa Residuos de Aparatos Eléctricos y Electrónicos. Requieren puntos EcoCómputo."
+            },
+            {
+                id: 17,
+                question: "¿Cuál es la diferencia entre Reciclar y Reutilizar?",
+                options: ["Son lo mismo", "Reutilizar es usar de nuevo; Reciclar es transformar industrialmente", "Reciclar es lavar"],
+                correct: 1,
+                feedback: "Exacto. Reutilizar alarga la vida; Reciclar crea nueva materia prima.",
+                wrongFeedback: "Reutilizar es darle otro uso (botella->termo). Reciclar implica proceso industrial (botella->fibra)."
+            },
+            {
+                id: 18,
+                question: "¿Cómo se llama el símbolo universal del reciclaje?",
+                options: ["Círculo de la Vida", "Triángulo de Moebius", "Cuadrado Verde"],
+                correct: 1,
+                feedback: "¡Cultura general! Las tres flechas representan: Recoger, Procesar, Comprar reciclado.",
+                wrongFeedback: "Es el Triángulo de Moebius (o Möbius)."
+            },
+            {
+                id: 19,
+                question: "Tapabocas y guantes desechables. ¿Dónde van?",
+                options: ["Bolsa Blanca", "Bolsa Negra", "Bolsa Verde"],
+                correct: 1,
+                feedback: "Por bioseguridad y material, van a la bolsa negra.",
+                wrongFeedback: "Son residuos biosanitarios no reciclables. Van a la negra."
+            },
+            {
+                id: 20,
+                question: "¿A quién ayudas principalmente cuando separas bien en la Bolsa Blanca?",
+                options: ["Al camión de basura", "A los Recicladores de Oficio", "A nadie"],
+                correct: 1,
+                feedback: "¡El corazón del sistema! Dignificas su trabajo y aumentas sus ingresos.",
+                wrongFeedback: "Ayudas directamente a los Recicladores de Oficio, que viven de recuperar este material."
+            }
+        ];
+
         const dailyChallenges = [
             "Desconecta todos los aparatos electrónicos que no estés usando (cargadores, microondas, consolas en stand-by).",
             "Revisa qué ropa no usas y sepárala para regalar o vender.",
@@ -325,25 +491,25 @@
                 {
                     title: "¿Basura o Tesoro?",
                     subtitle: "Aprende a diferenciar antes de botar.",
-                    image: "https://images.unsplash.com/photo-1683063005230-ec93739b6dd8?auto=format&fit=crop&w=1600&q=80",
+                    image: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=1600&q=80",
                     color: "from-blue-900/80 to-transparent"
                 },
                 {
                     title: "Compra Local",
                     subtitle: "Apoya a nuestros campesinos y reduce empaques.",
-                    image: "https://images.unsplash.com/photo-1686285540093-0613f74311dd?auto=format&fit=crop&w=1600&q=80",
+                    image: "https://images.unsplash.com/photo-1591191071477-4482d8c9735a?auto=format&fit=crop&w=1600&q=80",
                     color: "from-orange-900/80 to-transparent"
                 },
                 {
                     title: "Cuida el Agua",
                     subtitle: "Cada gota cuenta en nuestros páramos.",
-                    image: "https://images.unsplash.com/photo-1694475614339-a0adc86836d8?auto=format&fit=crop&w=1600&q=80",
+                    image: "https://images.unsplash.com/photo-1544473244-f6895e6e9b44?auto=format&fit=crop&w=1600&q=80",
                     color: "from-cyan-900/80 to-transparent"
                 },
                 {
                     title: "Sin Plástico",
                     subtitle: "Lleva tu talego, rechaza el pitillo.",
-                    image: "https://images.unsplash.com/photo-1661642056539-60fe43d29739?auto=format&fit=crop&w=1600&q=80",
+                    image: "https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?auto=format&fit=crop&w=1600&q=80",
                     color: "from-green-900/80 to-transparent"
                 },
                 {
@@ -404,6 +570,132 @@
                                 className={`h-2 rounded-full transition-all cursor-pointer shadow-sm ${idx === current ? 'bg-white w-12' : 'bg-white/40 w-3 hover:bg-white/80'}`} 
                             />
                         ))}
+                    </div>
+                </div>
+            );
+        };
+
+        // --- COMPONENTE TRIVIA ---
+        const TriviaGame = () => {
+            const [currentQIndex, setCurrentQIndex] = useState(0);
+            const [score, setScore] = useState(0);
+            const [showResult, setShowResult] = useState(false);
+            const [selectedOption, setSelectedOption] = useState(null);
+            const [isAnswered, setIsAnswered] = useState(false);
+
+            const currentQ = triviaData[currentQIndex];
+
+            const handleAnswer = (index) => {
+                if (isAnswered) return;
+                setSelectedOption(index);
+                setIsAnswered(true);
+                if (index === currentQ.correct) {
+                    setScore(score + 1);
+                }
+            };
+
+            const nextQuestion = () => {
+                if (currentQIndex < triviaData.length - 1) {
+                    setCurrentQIndex(currentQIndex + 1);
+                    setSelectedOption(null);
+                    setIsAnswered(false);
+                } else {
+                    setShowResult(true);
+                }
+            };
+
+            const resetGame = () => {
+                setCurrentQIndex(0);
+                setScore(0);
+                setShowResult(false);
+                setSelectedOption(null);
+                setIsAnswered(false);
+            };
+
+            if (showResult) {
+                let message = "";
+                // Escala para 20 preguntas
+                if (score >= 18) message = "¡Maestro del Reciclaje! 🏆";
+                else if (score >= 10) message = "¡Vas por buen camino! 🌱";
+                else message = "¡Sigue aprendiendo! 📚";
+
+                return (
+                    <div className="max-w-2xl mx-auto bg-white p-10 rounded-3xl shadow-xl text-center animate-in slide-up border border-slate-100">
+                        <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <Icons.Award size={48} className="text-emerald-600" />
+                        </div>
+                        <h2 className="text-3xl font-black text-slate-800 mb-2">Resultados</h2>
+                        <p className="text-xl text-emerald-600 font-bold mb-6">{message}</p>
+                        <p className="text-6xl font-black text-slate-800 mb-8">{score} / {triviaData.length}</p>
+                        <button 
+                            onClick={resetGame}
+                            className="bg-slate-900 text-white px-8 py-3 rounded-full font-bold hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2 mx-auto"
+                        >
+                            <Icons.RefreshCcw size={20} /> Intentar de nuevo
+                        </button>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="max-w-3xl mx-auto animate-in slide-up">
+                    <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
+                        <div className="bg-slate-900 text-white p-6 flex justify-between items-center">
+                            <span className="font-bold text-emerald-400">Pregunta {currentQIndex + 1} de {triviaData.length}</span>
+                            <div className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full">
+                                <Icons.Star size={16} className="text-yellow-400 fill-current" />
+                                <span>Puntos: {score}</span>
+                            </div>
+                        </div>
+                        
+                        <div className="p-8 md:p-12">
+                            <h3 className="text-2xl font-bold text-slate-800 mb-8 leading-tight">{currentQ.question}</h3>
+                            
+                            <div className="space-y-4 mb-8">
+                                {currentQ.options.map((opt, idx) => {
+                                    let btnClass = "w-full text-left p-5 rounded-2xl border-2 transition-all font-medium text-lg flex justify-between items-center ";
+                                    if (isAnswered) {
+                                        if (idx === currentQ.correct) btnClass += "bg-emerald-50 border-emerald-500 text-emerald-800 ";
+                                        else if (idx === selectedOption) btnClass += "bg-red-50 border-red-500 text-red-800 ";
+                                        else btnClass += "bg-white border-slate-100 opacity-50 ";
+                                    } else {
+                                        btnClass += "bg-white border-slate-200 hover:border-emerald-400 hover:shadow-md cursor-pointer text-slate-700 ";
+                                    }
+
+                                    return (
+                                        <button 
+                                            key={idx} 
+                                            onClick={() => handleAnswer(idx)}
+                                            disabled={isAnswered}
+                                            className={btnClass}
+                                        >
+                                            {opt}
+                                            {isAnswered && idx === currentQ.correct && <Icons.CheckCircle className="text-emerald-600" />}
+                                            {isAnswered && idx === selectedOption && idx !== currentQ.correct && <Icons.XCircle className="text-red-600" />}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+
+                            {isAnswered && (
+                                <div className={`p-6 rounded-2xl mb-8 border ${selectedOption === currentQ.correct ? 'bg-emerald-50 border-emerald-100' : 'bg-red-50 border-red-100'}`}>
+                                    <p className={`font-bold ${selectedOption === currentQ.correct ? 'text-emerald-800' : 'text-red-800'}`}>
+                                        {selectedOption === currentQ.correct ? currentQ.feedback : currentQ.wrongFeedback}
+                                    </p>
+                                </div>
+                            )}
+
+                            {isAnswered && (
+                                <div className="text-right">
+                                    <button 
+                                        onClick={nextQuestion}
+                                        className="bg-emerald-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-emerald-700 transition-colors inline-flex items-center gap-2"
+                                    >
+                                        {currentQIndex < triviaData.length - 1 ? "Siguiente Pregunta" : "Ver Resultados"} <Icons.ArrowRight size={20} />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             );
@@ -487,7 +779,7 @@
                                     <div className="bg-yellow-100 p-2 rounded-lg text-yellow-600">
                                         <Icons.Zap size={24} className="fill-current" />
                                     </div>
-                                    <h3 className="text-2xl font-bold text-slate-800">Retos ecológicos cotidianos</h3>
+                                    <h3 className="text-2xl font-bold text-slate-800">Reto Eco-Diario</h3>
                                 </div>
                                 <p className="text-xl text-slate-600 mb-6 leading-relaxed">
                                     {dailyChallenge ? dailyChallenge : "¿Te le mides a un reto sostenible hoy?"}
@@ -509,7 +801,7 @@
                                 <span className="text-white/80 text-xs font-bold uppercase tracking-widest mb-2">Dato de Impacto</span>
                                 <h4 className="text-5xl font-black mb-1">12M</h4>
                                 <p className="font-medium text-lg opacity-95 leading-tight mb-2">Toneladas de basura al año en Colombia.</p>
-                                <p className="text-sm bg-white/20 p-2 rounded-lg mt-2 inline-block backdrop-blur-sm">¡Solo reciclamos el 17%!</p>
+                                <p className="text-sm bg-white/20 p-2 rounded-lg mt-2 inline-block backdrop-blur-sm">Solo reciclamos el 17%.</p>
                             </div>
                         </div>
 
@@ -517,7 +809,7 @@
                         <div className="bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-slate-100">
                         
                             {/* Navegación Estilizada */}
-                            <div className="flex flex-col sm:flex-row border-b border-gray-100">
+                            <div className="flex flex-col md:flex-row border-b border-gray-100">
                                 <button 
                                 onClick={() => setActiveTab('explore')}
                                 className={`flex-1 py-6 text-center font-bold text-lg transition-all flex items-center justify-center gap-3 ${activeTab === 'explore' ? 'text-emerald-700 bg-emerald-50/50 border-b-4 border-emerald-500' : 'text-gray-400 hover:text-emerald-600 hover:bg-gray-50'}`}
@@ -532,6 +824,13 @@
                                 <Icons.HelpCircle className={activeTab === 'wizard' ? "fill-current" : ""} size={24} />
                                 Asistente de Decisión
                                 </button>
+                                <button 
+                                onClick={() => setActiveTab('trivia')}
+                                className={`flex-1 py-6 text-center font-bold text-lg transition-all flex items-center justify-center gap-3 ${activeTab === 'trivia' ? 'text-emerald-700 bg-emerald-50/50 border-b-4 border-emerald-500' : 'text-gray-400 hover:text-emerald-600 hover:bg-gray-50'}`}
+                                >
+                                <Icons.Brain className={activeTab === 'trivia' ? "fill-current" : ""} size={24} />
+                                Eco-Trivia
+                                </button>
                             </div>
 
                             <div className="p-6 md:p-12 bg-slate-50/50 min-h-[600px]">
@@ -543,7 +842,7 @@
                                     <>
                                         <div className="flex flex-col lg:flex-row items-end justify-between mb-10 gap-6">
                                         <div className="text-left max-w-2xl">
-                                            <h2 className="text-4xl font-black text-slate-800 mb-4 tracking-tight">La Escalera de la Sostenibilidad (Economía circular)</h2>
+                                            <h2 className="text-4xl font-black text-slate-800 mb-4 tracking-tight">La Escalera de la Sostenibilidad</h2>
                                             <p className="text-slate-500 text-lg leading-relaxed">Cada paso cuenta. Empieza desde arriba (Rechazar) y ve bajando hasta llegar al reciclaje solo si es necesario.</p>
                                         </div>
                                         
@@ -816,6 +1115,11 @@
                                     </div>
                                     )}
                                 </div>
+                                )}
+
+                                {/* PESTAÑA: TRIVIA */}
+                                {activeTab === 'trivia' && (
+                                    <TriviaGame />
                                 )}
 
                             </div>
