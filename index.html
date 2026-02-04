@@ -1,755 +1,815 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  ArrowRight, 
-  RotateCcw, 
-  Trash2, 
-  Wrench, 
-  Scissors, 
-  RefreshCw, 
-  PackageX, 
-  Lightbulb, 
-  TrendingDown, 
-  ShoppingBag,
-  CheckCircle,
-  XCircle,
-  Leaf,
-  ChevronLeft,
-  ChevronRight,
-  Info,
-  Heart,
-  Award,
-  Search,
-  Zap,
-  RefreshCcw,
-  Check,
-  Star,
-  HelpCircle
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eco-Brújula 9R | Colombia Sostenible</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel para JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
-// --- DATOS PRINCIPALES (CONTEXTO COLOMBIA) ---
-const rData = [
-  {
-    id: 'r0',
-    name: 'R0: Rechazar',
-    english: 'Refuse',
-    description: 'La decisión más tesa: decir "no" a lo que no necesitas.',
-    longDescription: 'Rechazar es evitar el problema antes de que entre a tu casa. En Colombia generamos toneladas de basura que podríamos evitar diciendo "no gracias" amablemente.',
-    icon: PackageX,
-    color: 'bg-red-50 text-red-700 border-red-200',
-    headerColor: 'bg-red-600',
-    examples: [
-      'Decir "sin pitillo, por favor" en el restaurante.',
-      'Rechazar volantes y publicidad en la calle.',
-      'No recibir bolsas plásticas en la tienda de barrio (lleva la tuya de tela).',
-      'Evitar comprar frutas envueltas en icopor y vinipel innecesario.'
-    ],
-    benefits: ['Ahorras plata de una.', 'Menos basura en la bolsa negra.', 'No llenas la casa de "chécheres".'],
-    tips: ['Lleva siempre tu bolsa ecológica al D1, Ara, Éxito, etc.', 'Pide la factura digital o al correo.', 'Evita los "regalos" promocionales que van directo a la basura.']
-  },
-  {
-    id: 'r1',
-    name: 'R1: Repensar',
-    english: 'Rethink',
-    description: 'Cambiar el chip: compartir en vez de comprar.',
-    longDescription: 'Repensar es cuestionar nuestros hábitos. ¿Para qué comprar algo que voy a usar dos veces? Mejor busquemos alternativas comunitarias o digitales.',
-    icon: Lightbulb,
-    color: 'bg-orange-50 text-orange-700 border-orange-200',
-    headerColor: 'bg-orange-500',
-    examples: [
-      'Compartir carro con compañeros (Carpooling) para evitar el Pico y Placa.',
-      'Ir a la biblioteca (como la Luis Ángel Arango o bibliotecas públicas) en vez de comprar libros.',
-      'Alquilar herramientas para arreglos puntuales.',
-      'Usar la copa menstrual.'
-    ],
-    benefits: ['Acceso a cosas mejores pagando menos.', 'Haces comunidad con tus vecinos.', 'Ayudas a descongestionar la ciudad.'],
-    tips: ['Antes de comprar, pregunta en el grupo de WhatsApp de la familia.', 'Usa apps de transporte compartido.', 'Pásate a facturas digitales.']
-  },
-  {
-    id: 'r2',
-    name: 'R2: Reducir',
-    english: 'Reduce',
-    description: 'Bajarle al consumo. Menos es más.',
-    longDescription: 'Si no puedes rechazarlo, úsalo menos. Se trata de eficiencia: que los servicios públicos no lleguen caros y generar menos desperdicio.',
-    icon: TrendingDown,
-    color: 'bg-yellow-50 text-yellow-700 border-yellow-200',
-    headerColor: 'bg-yellow-500',
-    examples: [
-      'Mercar a granel llevando tus propios tarros.',
-      'Imprimir por ambos lados de la hoja.',
-      'Bañarse rápido (cierra la llave mientras te enjabonas).',
-      'Cambiar los bombillos viejos por LED.'
-    ],
-    benefits: ['El recibo de la luz y el agua llegan más baratos.', 'Menos bolsas de basura que sacar.', 'Vida más simple.'],
-    tips: ['Compra repuestos tipo "doypack" (bolsa) para rellenar tus tarros.', 'Apoya la moda lenta colombiana.', 'Planifica el almuerzo para no botar comida.']
-  },
-  {
-    id: 'r3',
-    name: 'R3: Reutilizar',
-    english: 'Reuse',
-    description: 'Darle palo a las cosas hasta que se acaben.',
-    longDescription: 'Combate la cultura de "usar y tirar". Las abuelas colombianas son expertas en esto: el tarro de galletas se vuelve costurero.',
-    icon: ShoppingBag,
-    color: 'bg-lime-50 text-lime-700 border-lime-200',
-    headerColor: 'bg-lime-600',
-    examples: [
-      'Usar los frascos de café para guardar condimentos.',
-      'Comprar o vender ropa de segunda.',
-      'Usar cajas de zapatos para organizar el armario.',
-      'Rellenar la botella de agua en vez de comprar una nueva.'
-    ],
-    benefits: ['Ahorras plata.', 'Ayudas a gente que lo necesita.', 'Menos basura al relleno Doña Juana (o el de tu ciudad).'],
-    tips: ['Vende lo que no uses.', 'Carga siempre tu termo.', 'Usa trapos viejos para limpiar en vez de toallas de papel.']
-  },
-  {
-    id: 'r4',
-    name: 'R4: Reparar',
-    english: 'Repair',
-    description: 'Arreglar lo dañado. No lo botes, repáralo.',
-    longDescription: 'En Colombia somos recursivos. Reparar apoya la economía local y evita comprar cosas nuevas innecesarias.',
-    icon: Wrench,
-    color: 'bg-green-50 text-green-700 border-green-200',
-    headerColor: 'bg-green-600',
-    examples: [
-      'Zurcir las medias o pantalones.',
-      'Cambiarle la pila al reloj o al celular.',
-      'Pegar la oreja del pocillo favorito.',
-      'Llevar los tenis al zapatero para cambio de suela.'
-    ],
-    benefits: ['Tus cosas duran más.', 'Apoyas al zapatero y costurera del barrio.', 'Orgullo de arreglarlo tú mismo.'],
-    tips: ['Busca tutoriales en YouTube.', 'Ten aguja e hilo a la mano.', 'Ubica los talleres de reparación en tu barrio.']
-  },
-  {
-    id: 'r5',
-    name: 'R5: Restaurar',
-    english: 'Refurbish',
-    description: 'Engallar o renovar para que quede como nuevo.',
-    longDescription: 'Mejora el aspecto y funcionalidad. Es darle una segunda juventud a ese mueble o aparato viejo.',
-    icon: RefreshCw,
-    color: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    headerColor: 'bg-emerald-600',
-    examples: [
-      'Pintar muebles de madera antiguos.',
-      'Retapizar el sofá de la sala.',
-      'Ponerle un disco duro estado sólido al PC viejo.',
-      'Restaurar una bicicleta antigua.'
-    ],
-    benefits: ['Tienes cosas únicas.', 'Sale más barato que comprar nuevo.', 'Conservas objetos con historia.']
-  },
-  {
-    id: 'r6',
-    name: 'R6: Remanufacturar',
-    english: 'Remanufacture',
-    description: 'Reconstruir industrialmente con garantía.',
-    longDescription: 'Esto es más industrial. Se usan partes buenas para ensamblar productos que se venden con garantía.',
-    icon: RotateCcw,
-    color: 'bg-teal-50 text-teal-700 border-teal-200',
-    headerColor: 'bg-teal-600',
-    examples: [
-      'Motores y alternadores reconstruidos.',
-      'Cartuchos de impresora recargados originales.',
-      'Celulares "reacondicionados" certificados.',
-      'Mobiliario de oficina modular.'
-    ],
-    benefits: ['Garantía real.', 'Precio mucho más bajo.', 'Ahorro gigante de recursos industriales.']
-  },
-  {
-    id: 'r7',
-    name: 'R7: Reutilizar (Otro fin)',
-    english: 'Repurpose',
-    description: 'Reinventar: de basura a tesoro (Upcycling).',
-    longDescription: 'Pura creatividad criolla. Usar algo para lo que no fue diseñado, pero que funciona perfecto.',
-    icon: Scissors,
-    color: 'bg-cyan-50 text-cyan-700 border-cyan-200',
-    headerColor: 'bg-cyan-600',
-    examples: [
-      'Llantas viejas como materas.',
-      'Estibas (palets) convertidas en camas o mesas.',
-      'Botellas plásticas como "ladrillos ecológicos".',
-      'Hacer traperos con ropa vieja.'
-    ],
-    benefits: ['Explotas tu creatividad.', 'Decoración barata y original.', 'Evitas que vaya al relleno sanitario.']
-  },
-  {
-    id: 'r8',
-    name: 'R8: Reciclar',
-    english: 'Recycle',
-    description: 'Separar para transformar. La última opción.',
-    longDescription: 'Si ya no pudiste hacer nada de lo anterior, sepáralo bien para que los recicladores de oficio puedan aprovecharlo.',
-    icon: Trash2,
-    color: 'bg-blue-50 text-blue-700 border-blue-200',
-    headerColor: 'bg-blue-600',
-    examples: [
-      'Bolsa BLANCA: Plástico, vidrio, metal, papel, cartón (limpios).',
-      'Bolsa VERDE: Restos de comida (si aplica en tu municipio).',
-      'Bolsa NEGRA: Icopor sucio, servilletas, papel higiénico.',
-      'Puntos Pila: Baterías y celulares viejos.'
-    ],
-    benefits: ['Dignificas el trabajo del reciclador.', 'Ahorras materia prima.', 'Cumples la ley.'],
-    tips: ['Lava y seca los envases antes de botarlos.', 'Aplasta las botellas y cajas.', 'Entrega la bolsa blanca directamente al reciclador si puedes.']
-  }
-];
+    <!-- Fuente Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
 
-const dailyChallenges = [
-  "Hoy pídele al del jugo que NO te dé pitillo.",
-  "Revisa qué ropa no usas y sepárala para regalar o vender.",
-  "Báñate en lo que dura una canción (aprox. 4 min).",
-  "Ve a la tienda o supermercado con tu propia bolsa de tela.",
-  "Ese cajón que no cierra bien... ¡arréglalo hoy!",
-  "Haz un 'calentado' con lo que sobró del almuerzo de ayer.",
-  "Desenchufa el cargador del celular si no lo estás usando.",
-  "Averigua qué día pasa el camión del reciclaje en tu barrio."
-];
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Animaciones personalizadas */
+        .animate-in { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+    <div id="root"></div>
 
-// --- LOGICA DEL ARBOL DE DECISIÓN (WIZARD) ---
-const wizardFlow = {
-  start: {
-    question: "¿El objeto todavía funciona o cumple su función?",
-    options: [
-      { text: "Sí, funciona perfectamente", next: "check_buy" },
-      { text: "Funciona, pero no lo quiero", next: "check_reuse" },
-      { text: "No, está roto o dañado", next: "check_repair" }
-    ]
-  },
-  check_buy: {
-    question: "¿Es algo que vas a comprar o ya lo tienes en casa?",
-    options: [
-      { text: "Lo voy a comprar", next: "result_r0" }, // Rechazar
-      { text: "Ya lo tengo", next: "result_r1" } // Repensar/Reducir
-    ]
-  },
-  check_reuse: {
-    question: "¿Crees que alguien más (amigo, familiar, fundación) lo podría usar?",
-    options: [
-      { text: "Sí, está en buen estado", next: "result_r3" }, // Reutilizar
-      { text: "No, está feo o desgastado", next: "check_restore" }
-    ]
-  },
-  check_restore: {
-    question: "¿Si lo pintaras, limpiaras o arreglaras un poco, te lo quedarías o alguien lo querría?",
-    options: [
-      { text: "Sí, con una 'manito de gato' aguanta", next: "result_r5" }, // Restaurar
-      { text: "No, no vale la pena", next: "check_repurpose" }
-    ]
-  },
-  check_repair: {
-    question: "¿Crees que tiene arreglo? (Coser, pegar, cambiar pieza, llevar al técnico)",
-    options: [
-      { text: "Sí, se puede arreglar", next: "result_r4" }, // Reparar
-      { text: "No, el daño es grave", next: "check_parts" }
-    ]
-  },
-  check_parts: {
-    question: "¿Tiene partes complejas que sirvan de repuesto? (Motores, chips, piezas buenas)",
-    options: [
-      { text: "Sí, tiene componentes útiles", next: "result_r6" }, // Remanufacturar
-      { text: "No, es material simple", next: "check_repurpose" }
-    ]
-  },
-  check_repurpose: {
-    question: "¿Se te ocurre otro uso creativo? (Ej. botella -> matera, ropa vieja -> trapo)",
-    options: [
-      { text: "Sí, tengo una idea", next: "result_r7" }, // Upcycling
-      { text: "No, ni idea", next: "result_r8" } // Reciclar
-    ]
-  }
-};
+    <script type="text/babel">
+        const { useState, useEffect } = React;
 
-// --- COMPONENTE CARRUSEL (BANNER MEJORADO - 6 IMAGENES) ---
-const HeroCarousel = () => {
-  const slides = [
-    {
-      title: "Colombia Sostenible",
-      subtitle: "Nuestra biodiversidad depende de lo que hagas hoy.",
-      image: "https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&w=1600&q=80",
-      color: "from-emerald-900/80 to-transparent"
-    },
-    {
-      title: "¿Basura o Tesoro?",
-      subtitle: "Aprende a diferenciar antes de botar.",
-      image: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=1600&q=80",
-      color: "from-blue-900/80 to-transparent"
-    },
-    {
-      title: "Compra Local",
-      subtitle: "Apoya a nuestros campesinos y reduce empaques.",
-      image: "https://images.unsplash.com/photo-1591191071477-4482d8c9735a?auto=format&fit=crop&w=1600&q=80",
-      color: "from-orange-900/80 to-transparent"
-    },
-    {
-      title: "Cuida el Agua",
-      subtitle: "Cada gota cuenta en nuestros páramos.",
-      image: "https://images.unsplash.com/photo-1544473244-f6895e6e9b44?auto=format&fit=crop&w=1600&q=80", // Paisaje agua
-      color: "from-cyan-900/80 to-transparent"
-    },
-    {
-      title: "Sin Plástico",
-      subtitle: "Lleva tu talego, rechaza el pitillo.",
-      image: "https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?auto=format&fit=crop&w=1600&q=80", // Bolsa tela
-      color: "from-green-900/80 to-transparent"
-    },
-    {
-      title: "Reciclaje Real",
-      subtitle: "Limpio, seco y en la bolsa blanca.",
-      image: "https://images.unsplash.com/photo-1604187351574-c75ca79f5807?auto=format&fit=crop&w=1600&q=80", // Reciclaje
-      color: "from-slate-900/80 to-transparent"
-    }
-  ];
+        // --- ICONOS (LUCIDE REPLICA) ---
+        // Definimos los iconos como componentes SVG para evitar dependencias externas complejas
+        const Icons = {
+            ArrowRight: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>,
+            RotateCcw: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>,
+            Trash2: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>,
+            Wrench: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>,
+            Scissors: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" x2="8.12" y1="4" y2="15.88"/><line x1="14.47" x2="20" y1="14.48" y2="20"/><line x1="8.12" x2="12" y1="8.12" y2="12"/></svg>,
+            RefreshCw: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>,
+            PackageX: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"/><path d="m7.5 4.27 9 5.15"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" x2="12" y1="22" y2="12"/><path d="m17 13 5 5m-5 0 5-5"/></svg>,
+            Lightbulb: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-1 1.5-2.4 1.5-3.8 0-3.2-2.8-6-6-6S6 4.8 6 8c0 1.4.5 2.8 1.5 3.8.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>,
+            TrendingDown: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>,
+            ShoppingBag: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>,
+            CheckCircle: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>,
+            XCircle: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>,
+            Leaf: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>,
+            ChevronLeft: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m15 18-6-6 6-6"/></svg>,
+            ChevronRight: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m9 18 6-6-6-6"/></svg>,
+            Info: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>,
+            Heart: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>,
+            Award: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>,
+            Search: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>,
+            Zap: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
+            RefreshCcw: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v-5"/></svg>,
+            RotateCcw: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>,
+            Check: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="20 6 9 17 4 12"/></svg>,
+            Star: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
+            HelpCircle: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>,
+            MapPin: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        };
 
-  const [current, setCurrent] = useState(0);
+        // --- DATOS PRINCIPALES (CONTEXTO COLOMBIA) ---
+        const rData = [
+            {
+                id: 'r0',
+                name: 'R0: Rechazar',
+                english: 'Refuse',
+                description: 'La decisión más tesa: decir "no" a lo que no necesitas.',
+                longDescription: 'Rechazar es evitar el problema antes de que entre a tu casa. En Colombia generamos toneladas de basura que podríamos evitar diciendo "no gracias" amablemente.',
+                icon: 'PackageX',
+                color: 'bg-red-50 text-red-700 border-red-200',
+                headerColor: 'bg-red-600',
+                examples: [
+                    'Decir "sin pitillo, por favor" en el restaurante.',
+                    'Rechazar volantes y publicidad en la calle.',
+                    'No recibir bolsas plásticas en la tienda de barrio (lleva la tuya de tela).',
+                    'Evitar comprar frutas envueltas en icopor y vinipel innecesario.'
+                ],
+                benefits: ['Ahorras plata de una.', 'Menos basura en la bolsa negra.', 'No llenas la casa de "chécheres".'],
+                tips: ['Lleva siempre tu bolsa ecológica al D1, Ara, Éxito, etc.', 'Pide la factura digital o al correo.', 'Evita los "regalos" promocionales que van directo a la basura.']
+            },
+            {
+                id: 'r1',
+                name: 'R1: Repensar',
+                english: 'Rethink',
+                description: 'Cambiar el chip: compartir en vez de comprar.',
+                longDescription: 'Repensar es cuestionar nuestros hábitos. ¿Para qué comprar algo que voy a usar dos veces? Mejor busquemos alternativas comunitarias o digitales.',
+                icon: 'Lightbulb',
+                color: 'bg-orange-50 text-orange-700 border-orange-200',
+                headerColor: 'bg-orange-500',
+                examples: [
+                    'Compartir carro con compañeros (Carpooling) para evitar el Pico y Placa.',
+                    'Ir a la biblioteca (como la Luis Ángel Arango o bibliotecas públicas) en vez de comprar libros.',
+                    'Alquilar herramientas para arreglos puntuales.',
+                    'Usar la copa menstrual.'
+                ],
+                benefits: ['Acceso a cosas mejores pagando menos.', 'Haces comunidad con tus vecinos.', 'Ayudas a descongestionar la ciudad.'],
+                tips: ['Antes de comprar, pregunta en el grupo de WhatsApp de la familia.', 'Usa apps de transporte compartido.', 'Pásate a facturas digitales.']
+            },
+            {
+                id: 'r2',
+                name: 'R2: Reducir',
+                english: 'Reduce',
+                description: 'Bajarle al consumo. Menos es más.',
+                longDescription: 'Si no puedes rechazarlo, úsalo menos. Se trata de eficiencia: que los servicios públicos no lleguen caros y generar menos desperdicio.',
+                icon: 'TrendingDown',
+                color: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+                headerColor: 'bg-yellow-500',
+                examples: [
+                    'Mercar a granel llevando tus propios tarros.',
+                    'Imprimir por ambos lados de la hoja.',
+                    'Bañarse rápido (cierra la llave mientras te enjabonas).',
+                    'Cambiar los bombillos viejos por LED.'
+                ],
+                benefits: ['El recibo de la luz y el agua llegan más baratos.', 'Menos bolsas de basura que sacar.', 'Vida más simple.'],
+                tips: ['Compra repuestos tipo "doypack" (bolsa) para rellenar tus tarros.', 'Apoya la moda lenta colombiana.', 'Planifica el almuerzo para no botar comida.']
+            },
+            {
+                id: 'r3',
+                name: 'R3: Reutilizar',
+                english: 'Reuse',
+                description: 'Darle palo a las cosas hasta que se acaben.',
+                longDescription: 'Combate la cultura de "usar y tirar". Las abuelas colombianas son expertas en esto: el tarro de galletas se vuelve costurero.',
+                icon: 'ShoppingBag',
+                color: 'bg-lime-50 text-lime-700 border-lime-200',
+                headerColor: 'bg-lime-600',
+                examples: [
+                    'Usar los frascos de café para guardar condimentos.',
+                    'Comprar o vender ropa de segunda.',
+                    'Usar cajas de zapatos para organizar el armario.',
+                    'Rellenar la botella de agua en vez de comprar una nueva.'
+                ],
+                benefits: ['Ahorras plata.', 'Ayudas a gente que lo necesita.', 'Menos basura al relleno Doña Juana (o el de tu ciudad).'],
+                tips: ['Vende lo que no uses.', 'Carga siempre tu termo.', 'Usa trapos viejos para limpiar en vez de toallas de papel.']
+            },
+            {
+                id: 'r4',
+                name: 'R4: Reparar',
+                english: 'Repair',
+                description: 'Arreglar lo dañado. No lo botes, repáralo.',
+                longDescription: 'En Colombia somos recursivos. Reparar apoya la economía local y evita comprar cosas nuevas innecesarias.',
+                icon: 'Wrench',
+                color: 'bg-green-50 text-green-700 border-green-200',
+                headerColor: 'bg-green-600',
+                examples: [
+                    'Zurcir las medias o pantalones.',
+                    'Cambiarle la pila al reloj o al celular.',
+                    'Pegar la oreja del pocillo favorito.',
+                    'Llevar los tenis al zapatero para cambio de suela.'
+                ],
+                benefits: ['Tus cosas duran más.', 'Apoyas al zapatero y costurera del barrio.', 'Orgullo de arreglarlo tú mismo.'],
+                tips: ['Busca tutoriales en YouTube.', 'Ten aguja e hilo a la mano.', 'Ubica los talleres de reparación en tu barrio.']
+            },
+            {
+                id: 'r5',
+                name: 'R5: Restaurar',
+                english: 'Refurbish',
+                description: 'Engallar o renovar para que quede como nuevo.',
+                longDescription: 'Mejora el aspecto y funcionalidad. Es darle una segunda juventud a ese mueble o aparato viejo.',
+                icon: 'RefreshCw',
+                color: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                headerColor: 'bg-emerald-600',
+                examples: [
+                    'Pintar muebles de madera antiguos.',
+                    'Retapizar el sofá de la sala.',
+                    'Ponerle un disco duro estado sólido al PC viejo.',
+                    'Restaurar una bicicleta antigua.'
+                ],
+                benefits: ['Tienes cosas únicas.', 'Sale más barato que comprar nuevo.', 'Conservas objetos con historia.']
+            },
+            {
+                id: 'r6',
+                name: 'R6: Remanufacturar',
+                english: 'Remanufacture',
+                description: 'Reconstruir industrialmente con garantía.',
+                longDescription: 'Esto es más industrial. Se usan partes buenas para ensamblar productos que se venden con garantía.',
+                icon: 'RotateCcw',
+                color: 'bg-teal-50 text-teal-700 border-teal-200',
+                headerColor: 'bg-teal-600',
+                examples: [
+                    'Motores y alternadores reconstruidos.',
+                    'Cartuchos de impresora recargados originales.',
+                    'Celulares "reacondicionados" certificados.',
+                    'Mobiliario de oficina modular.'
+                ],
+                benefits: ['Garantía real.', 'Precio mucho más bajo.', 'Ahorro gigante de recursos industriales.']
+            },
+            {
+                id: 'r7',
+                name: 'R7: Reutilizar (Otro fin)',
+                english: 'Repurpose',
+                description: 'Reinventar: de basura a tesoro (Upcycling).',
+                longDescription: 'Pura creatividad criolla. Usar algo para lo que no fue diseñado, pero que funciona perfecto.',
+                icon: 'Scissors',
+                color: 'bg-cyan-50 text-cyan-700 border-cyan-200',
+                headerColor: 'bg-cyan-600',
+                examples: [
+                    'Llantas viejas como materas.',
+                    'Estibas (palets) convertidas en camas o mesas.',
+                    'Botellas plásticas como "ladrillos ecológicos".',
+                    'Hacer traperos con ropa vieja.'
+                ],
+                benefits: ['Explotas tu creatividad.', 'Decoración barata y original.', 'Evitas que vaya al relleno sanitario.']
+            },
+            {
+                id: 'r8',
+                name: 'R8: Reciclar',
+                english: 'Recycle',
+                description: 'Separar para transformar. La última opción.',
+                longDescription: 'Si ya no pudiste hacer nada de lo anterior, sepáralo bien para que los recicladores de oficio puedan aprovecharlo.',
+                icon: 'Trash2',
+                color: 'bg-blue-50 text-blue-700 border-blue-200',
+                headerColor: 'bg-blue-600',
+                examples: [
+                    'Bolsa BLANCA: Plástico, vidrio, metal, papel, cartón (limpios).',
+                    'Bolsa VERDE: Restos de comida (si aplica en tu municipio).',
+                    'Bolsa NEGRA: Icopor sucio, servilletas, papel higiénico.',
+                    'Puntos Pila: Baterías y celulares viejos.'
+                ],
+                benefits: ['Dignificas el trabajo del reciclador.', 'Ahorras materia prima.', 'Cumples la ley.'],
+                tips: ['Lava y seca los envases antes de botarlos.', 'Aplasta las botellas y cajas.', 'Entrega la bolsa blanca directamente al reciclador si puedes.']
+            }
+        ];
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % slides.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [slides.length]);
+        const dailyChallenges = [
+            "Hoy pídele al del jugo que NO te dé pitillo.",
+            "Revisa qué ropa no usas y sepárala para regalar o vender.",
+            "Báñate en lo que dura una canción (aprox. 4 min).",
+            "Ve a la tienda o supermercado con tu propia bolsa de tela.",
+            "Ese cajón que no cierra bien... ¡arréglalo hoy!",
+            "Haz un 'calentado' con lo que sobró del almuerzo de ayer.",
+            "Desenchufa el cargador del celular si no lo estás usando.",
+            "Averigua qué día pasa el camión del reciclaje en tu barrio."
+        ];
 
-  const nextSlide = () => setCurrent((current + 1) % slides.length);
-  const prevSlide = () => setCurrent((current - 1 + slides.length) % slides.length);
+        // --- LOGICA DEL ARBOL DE DECISIÓN (WIZARD) ---
+        const wizardFlow = {
+            start: {
+                question: "¿El objeto todavía funciona o cumple su función?",
+                options: [
+                    { text: "Sí, funciona perfectamente", next: "check_buy" },
+                    { text: "Funciona, pero no lo quiero", next: "check_reuse" },
+                    { text: "No, está roto o dañado", next: "check_repair" }
+                ]
+            },
+            check_buy: {
+                question: "¿Es algo que vas a comprar o ya lo tienes en casa?",
+                options: [
+                    { text: "Lo voy a comprar", next: "result_r0" }, // Rechazar
+                    { text: "Ya lo tengo", next: "result_r1" } // Repensar/Reducir
+                ]
+            },
+            check_reuse: {
+                question: "¿Crees que alguien más (amigo, familiar, fundación) lo podría usar?",
+                options: [
+                    { text: "Sí, está en buen estado", next: "result_r3" }, // Reutilizar
+                    { text: "No, está feo o desgastado", next: "check_restore" }
+                ]
+            },
+            check_restore: {
+                question: "¿Si lo pintaras, limpiaras o arreglaras un poco, te lo quedarías o alguien lo querría?",
+                options: [
+                    { text: "Sí, con una 'manito de gato' aguanta", next: "result_r5" }, // Restaurar
+                    { text: "No, no vale la pena", next: "check_repurpose" }
+                ]
+            },
+            check_repair: {
+                question: "¿Crees que tiene arreglo? (Coser, pegar, cambiar pieza, llevar al técnico)",
+                options: [
+                    { text: "Sí, se puede arreglar", next: "result_r4" }, // Reparar
+                    { text: "No, el daño es grave", next: "check_parts" }
+                ]
+            },
+            check_parts: {
+                question: "¿Tiene partes complejas que sirvan de repuesto? (Motores, chips, piezas buenas)",
+                options: [
+                    { text: "Sí, tiene componentes útiles", next: "result_r6" }, // Remanufacturar
+                    { text: "No, es material simple", next: "check_repurpose" }
+                ]
+            },
+            check_repurpose: {
+                question: "¿Se te ocurre otro uso creativo? (Ej. botella -> matera, ropa vieja -> trapo)",
+                options: [
+                    { text: "Sí, tengo una idea", next: "result_r7" }, // Upcycling
+                    { text: "No, ni idea", next: "result_r8" } // Reciclar
+                ]
+            }
+        };
 
-  return (
-    <div className="relative w-full h-[400px] md:h-[480px] overflow-hidden rounded-3xl shadow-2xl mb-12 group">
-      {slides.map((slide, index) => (
-        <div 
-          key={index}
-          className={`absolute inset-0 transition-all duration-1000 ease-in-out ${index === current ? 'opacity-100 scale-100' : 'opacity-0 scale-105'}`}
-        >
-          <div 
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url('${slide.image}')` }}
-          />
-          {/* Overlay con gradiente para texto */}
-          <div className={`absolute inset-0 bg-gradient-to-r ${slide.color}`}></div>
-          
-          <div className="relative z-10 h-full flex flex-col justify-center px-8 md:px-16 text-white max-w-3xl">
-            <h2 className="text-5xl md:text-7xl font-black mb-6 drop-shadow-lg leading-tight tracking-tight animate-in slide-in-from-left duration-1000">{slide.title}</h2>
-            <div className="h-2 w-24 bg-white/50 mb-6 rounded-full"></div>
-            <p className="text-xl md:text-3xl font-light opacity-95 drop-shadow-md animate-in fade-in duration-1000 delay-300">{slide.subtitle}</p>
-          </div>
-        </div>
-      ))}
-      
-      <div className="absolute bottom-8 right-8 flex gap-4">
-        <button onClick={prevSlide} className="bg-white/10 hover:bg-white/30 text-white p-4 rounded-full backdrop-blur-md transition-all border border-white/20 shadow-lg hover:scale-110">
-          <ChevronLeft size={28} />
-        </button>
-        <button onClick={nextSlide} className="bg-white/10 hover:bg-white/30 text-white p-4 rounded-full backdrop-blur-md transition-all border border-white/20 shadow-lg hover:scale-110">
-          <ChevronRight size={28} />
-        </button>
-      </div>
+        // --- COMPONENTE CARRUSEL ---
+        const HeroCarousel = () => {
+            const slides = [
+                {
+                    title: "Colombia Sostenible",
+                    subtitle: "Nuestra biodiversidad depende de lo que hagas hoy.",
+                    image: "https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&w=1600&q=80",
+                    color: "from-emerald-900/80 to-transparent"
+                },
+                {
+                    title: "¿Basura o Tesoro?",
+                    subtitle: "Aprende a diferenciar antes de botar.",
+                    image: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=1600&q=80",
+                    color: "from-blue-900/80 to-transparent"
+                },
+                {
+                    title: "Compra Local",
+                    subtitle: "Apoya a nuestros campesinos y reduce empaques.",
+                    image: "https://images.unsplash.com/photo-1591191071477-4482d8c9735a?auto=format&fit=crop&w=1600&q=80",
+                    color: "from-orange-900/80 to-transparent"
+                },
+                {
+                    title: "Cuida el Agua",
+                    subtitle: "Cada gota cuenta en nuestros páramos.",
+                    image: "https://images.unsplash.com/photo-1544473244-f6895e6e9b44?auto=format&fit=crop&w=1600&q=80",
+                    color: "from-cyan-900/80 to-transparent"
+                },
+                {
+                    title: "Sin Plástico",
+                    subtitle: "Lleva tu talego, rechaza el pitillo.",
+                    image: "https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?auto=format&fit=crop&w=1600&q=80",
+                    color: "from-green-900/80 to-transparent"
+                },
+                {
+                    title: "Reciclaje Real",
+                    subtitle: "Limpio, seco y en la bolsa blanca.",
+                    image: "https://images.unsplash.com/photo-1604187351574-c75ca79f5807?auto=format&fit=crop&w=1600&q=80",
+                    color: "from-slate-900/80 to-transparent"
+                }
+            ];
 
-      <div className="absolute bottom-8 left-8 md:left-16 flex gap-2">
-        {slides.map((_, idx) => (
-          <div 
-            key={idx} 
-            onClick={() => setCurrent(idx)}
-            className={`h-2 rounded-full transition-all cursor-pointer shadow-sm ${idx === current ? 'bg-white w-12' : 'bg-white/40 w-3 hover:bg-white/80'}`} 
-          />
-        ))}
-      </div>
-    </div>
-  );
-};
+            const [current, setCurrent] = useState(0);
 
-export default function App() {
-  const [activeTab, setActiveTab] = useState('explore'); 
-  
-  // Estados para Wizard
-  const [wizardCurrentNode, setWizardCurrentNode] = useState('start');
-  const [wizardFinished, setWizardFinished] = useState(false);
-  const [wizardResult, setWizardResult] = useState(null);
+            useEffect(() => {
+                const timer = setInterval(() => {
+                    setCurrent((prev) => (prev + 1) % slides.length);
+                }, 5000);
+                return () => clearInterval(timer);
+            }, [slides.length]);
 
-  // Estados para Detalle y Tips Interactivos
-  const [selectedR, setSelectedR] = useState(null);
-  const [completedTips, setCompletedTips] = useState({});
+            const nextSlide = () => setCurrent((current + 1) % slides.length);
+            const prevSlide = () => setCurrent((current - 1 + slides.length) % slides.length);
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [dailyChallenge, setDailyChallenge] = useState(null);
-
-  const filteredRs = rData.filter(item => 
-    item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.examples.some(ex => ex.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    item.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const generateChallenge = () => {
-    const random = dailyChallenges[Math.floor(Math.random() * dailyChallenges.length)];
-    setDailyChallenge(random);
-  };
-
-  const toggleTip = (rId, tipIndex) => {
-    const key = `${rId}-${tipIndex}`;
-    setCompletedTips(prev => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
-  };
-
-  // --- LÓGICA DEL ASISTENTE ---
-  const handleWizardOption = (nextStep) => {
-    if (nextStep.startsWith('result_')) {
-      const rId = nextStep.replace('result_', '');
-      const resultData = rData.find(r => r.id === rId);
-      
-      setWizardResult({
-        status: 'success',
-        data: resultData
-      });
-      setWizardFinished(true);
-    } else {
-      setWizardCurrentNode(nextStep);
-    }
-  };
-
-  const resetWizard = () => {
-    setWizardCurrentNode('start');
-    setWizardFinished(false);
-    setWizardResult(null);
-  };
-
-  return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-800 p-4 md:p-8">
-      <div className="max-w-7xl mx-auto">
-        
-        <HeroCarousel />
-
-        {/* Reto Diario y Dato Impactante */}
-        <div className="mb-12 grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="md:col-span-3 bg-white rounded-3xl p-8 border border-slate-100 shadow-xl relative overflow-hidden flex flex-col justify-center">
-             <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-50 rounded-full -translate-y-1/2 translate-x-1/2 opacity-50"></div>
-             <div className="relative z-10">
-               <div className="flex items-center gap-3 mb-4">
-                 <div className="bg-yellow-100 p-2 rounded-lg text-yellow-600">
-                   <Zap size={24} className="fill-current" />
-                 </div>
-                 <h3 className="text-2xl font-bold text-slate-800">Reto Eco-Diario</h3>
-               </div>
-               <p className="text-xl text-slate-600 mb-6 leading-relaxed">
-                 {dailyChallenge ? dailyChallenge : "¿Te le mides a un reto sostenible hoy?"}
-               </p>
-               <button 
-                 onClick={generateChallenge}
-                 className="bg-slate-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-emerald-600 transition-colors flex items-center gap-2 w-fit shadow-lg shadow-slate-200"
-               >
-                 <RefreshCcw size={18} />
-                 {dailyChallenge ? "Dame otro reto" : "Generar Reto"}
-               </button>
-             </div>
-          </div>
-          
-          <div className="bg-gradient-to-br from-red-500 to-rose-600 p-8 rounded-3xl shadow-xl text-white flex flex-col justify-center relative overflow-hidden">
-             <Trash2 className="absolute -bottom-4 -right-4 w-32 h-32 opacity-20 rotate-12" />
-             <span className="text-white/80 text-xs font-bold uppercase tracking-widest mb-2">Dato de Impacto</span>
-             <h4 className="text-5xl font-black mb-1">12M</h4>
-             <p className="font-medium text-lg opacity-95 leading-tight mb-2">Toneladas de basura al año en Colombia.</p>
-             <p className="text-sm bg-white/20 p-2 rounded-lg mt-2 inline-block backdrop-blur-sm">Solo reciclamos el 17%.</p>
-          </div>
-        </div>
-
-        {/* Contenedor Principal */}
-        <div className="bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-slate-100">
-          
-          {/* Navegación Estilizada */}
-          <div className="flex flex-col sm:flex-row border-b border-gray-100">
-            <button 
-              onClick={() => setActiveTab('explore')}
-              className={`flex-1 py-6 text-center font-bold text-lg transition-all flex items-center justify-center gap-3 ${activeTab === 'explore' ? 'text-emerald-700 bg-emerald-50/50 border-b-4 border-emerald-500' : 'text-gray-400 hover:text-emerald-600 hover:bg-gray-50'}`}
-            >
-              <Lightbulb className={activeTab === 'explore' ? "fill-current" : ""} size={24} />
-              Explorar las 9R
-            </button>
-            <button 
-              onClick={() => setActiveTab('wizard')}
-              className={`flex-1 py-6 text-center font-bold text-lg transition-all flex items-center justify-center gap-3 ${activeTab === 'wizard' ? 'text-emerald-700 bg-emerald-50/50 border-b-4 border-emerald-500' : 'text-gray-400 hover:text-emerald-600 hover:bg-gray-50'}`}
-            >
-              <HelpCircle className={activeTab === 'wizard' ? "fill-current" : ""} size={24} />
-              Asistente de Decisión
-            </button>
-          </div>
-
-          <div className="p-6 md:p-12 bg-slate-50/50 min-h-[600px]">
-            
-            {/* PESTAÑA: EXPLORAR */}
-            {activeTab === 'explore' && (
-              <div className="animate-in fade-in duration-500">
-                {!selectedR ? (
-                  <>
-                    <div className="flex flex-col lg:flex-row items-end justify-between mb-10 gap-6">
-                      <div className="text-left max-w-2xl">
-                        <h2 className="text-4xl font-black text-slate-800 mb-4 tracking-tight">La Escalera de la Sostenibilidad</h2>
-                        <p className="text-slate-500 text-lg leading-relaxed">Cada paso cuenta. Empieza desde arriba (Rechazar) y ve bajando hasta llegar al reciclaje solo si es necesario.</p>
-                      </div>
-                      
-                      <div className="relative w-full lg:w-96">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                        <input 
-                          type="text" 
-                          placeholder="Buscar (ej. icopor, ropa...)" 
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                          className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-2xl focus:ring-4 focus:ring-emerald-100 focus:border-emerald-500 focus:outline-none transition-shadow shadow-sm text-lg"
-                        />
-                      </div>
-                    </div>
-
-                    {filteredRs.length === 0 ? (
-                      <div className="text-center py-20 opacity-50 bg-white rounded-3xl border border-dashed border-slate-300">
-                        <Leaf className="w-16 h-16 mx-auto mb-4 text-slate-300" />
-                        <p className="text-xl font-medium">No encontramos resultados para "{searchTerm}"</p>
-                        <button onClick={() => setSearchTerm("")} className="text-emerald-600 font-bold mt-2 hover:underline">Limpiar búsqueda</button>
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                        {filteredRs.map((item) => (
-                          <div 
-                            key={item.id} 
-                            onClick={() => setSelectedR(item)}
-                            className={`${item.color} group relative p-8 rounded-[2rem] cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl border-2 hover:border-black/5 flex flex-col h-full`}
-                          >
-                            <div className={`absolute top-0 right-0 px-4 py-2 rounded-bl-2xl rounded-tr-2xl ${item.headerColor} text-white font-bold text-xs tracking-wider uppercase shadow-sm`}>
-                              {item.english}
-                            </div>
-                            
-                            <div className="mb-6 mt-2">
-                              <div className="bg-white w-20 h-20 rounded-2xl flex items-center justify-center shadow-md group-hover:rotate-6 transition-transform duration-300">
-                                <item.icon className="w-10 h-10 opacity-90" />
-                              </div>
-                            </div>
-                            
-                            <h3 className="text-3xl font-black mb-2 tracking-tight">{item.name.split(':')[1]}</h3>
-                            <div className="h-1.5 w-12 bg-current opacity-20 mb-4 rounded-full"></div>
-                            <p className="text-base font-medium opacity-80 mb-8 flex-grow leading-relaxed">{item.description}</p>
-                            
-                            {searchTerm && (
-                              <div className="bg-white/60 backdrop-blur-sm p-3 rounded-xl text-sm mb-6 border border-white/50">
-                                <span className="font-bold">Encontrado:</span> {item.examples.find(ex => ex.toLowerCase().includes(searchTerm.toLowerCase()))}
-                              </div>
-                            )}
-
-                            <div className="mt-auto flex items-center text-sm font-extrabold opacity-70 group-hover:opacity-100 transition-opacity uppercase tracking-wide">
-                              <Info size={18} className="mr-2" />
-                              Ver Guía Completa
-                              <ArrowRight size={18} className="ml-auto transform group-hover:translate-x-2 transition-transform" />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  // MODAL DE DETALLE
-                  <div className="max-w-5xl mx-auto animate-in zoom-in-95 duration-300">
-                    <button 
-                      onClick={() => setSelectedR(null)}
-                      className="mb-8 flex items-center text-slate-500 hover:text-emerald-700 font-bold text-lg transition-colors group"
-                    >
-                      <div className="bg-white p-2 rounded-full shadow-sm mr-3 group-hover:shadow-md transition-shadow">
-                        <ChevronLeft size={24} /> 
-                      </div>
-                      Volver al listado
-                    </button>
-
-                    <div className="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-100">
-                      <div className={`${selectedR.headerColor} p-10 md:p-16 text-white relative overflow-hidden`}>
-                        <selectedR.icon className="absolute -right-12 -bottom-12 w-80 h-80 opacity-10 rotate-12" />
-                        <div className="relative z-10">
-                            <span className="opacity-80 font-bold tracking-widest uppercase mb-2 block">{selectedR.english}</span>
-                            <h2 className="text-5xl md:text-7xl font-black mb-4 tracking-tight">{selectedR.name}</h2>
-                        </div>
-                      </div>
-                      
-                      <div className="p-8 md:p-12 grid grid-cols-1 lg:grid-cols-12 gap-12">
-                        {/* COLUMNA IZQUIERDA (INFO) */}
-                        <div className="lg:col-span-7">
-                          <h3 className="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-3">
-                            <div className="bg-emerald-100 p-2 rounded-lg text-emerald-600"><Info size={20} /></div>
-                            Concepto Clave
-                          </h3>
-                          <p className="text-slate-600 leading-relaxed text-xl mb-10 border-l-4 border-emerald-500 pl-6">{selectedR.longDescription}</p>
-                          
-                          <h3 className="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3">
-                            <div className="bg-yellow-100 p-2 rounded-lg text-yellow-600"><Star size={20} /></div>
-                            Beneficios
-                          </h3>
-                          <div className="grid grid-cols-1 gap-4 mb-10">
-                            {selectedR.benefits.map((b, i) => (
-                              <div key={i} className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-emerald-200 transition-colors group">
-                                <div className="min-w-8 h-8 rounded-full bg-white border border-emerald-100 flex items-center justify-center text-emerald-600 font-bold shadow-sm group-hover:scale-110 transition-transform">✓</div>
-                                <span className="text-slate-700 font-medium text-lg">{b}</span>
-                              </div>
-                            ))}
-                          </div>
-
-                           <h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-3">
-                            <div className="bg-orange-100 p-2 rounded-lg text-orange-600"><Lightbulb size={20} /></div>
-                            Ejemplos Reales
-                          </h3>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {selectedR.examples.map((ex, i) => (
-                              <div key={i} className="flex items-start gap-3 text-slate-600 text-sm bg-slate-50 p-3 rounded-xl">
-                                <div className="min-w-1.5 h-1.5 rounded-full bg-orange-400 mt-2"></div>
-                                {ex}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                        
-                        {/* COLUMNA DERECHA (INTERACTIVA) */}
-                        <div className="lg:col-span-5 flex flex-col h-full">
-                          <div className="bg-slate-50 p-8 rounded-[2rem] border border-slate-200 h-full shadow-inner">
-                            <h3 className="text-xl font-bold text-slate-800 mb-2 flex items-center gap-3">
-                              <CheckCircle className="text-emerald-600" size={24} /> 
-                              Checklist de Acción
-                            </h3>
-                            <p className="text-slate-500 mb-8">Marca lo que ya aplicas en tu día a día:</p>
-                            
-                            <div className="space-y-4">
-                              {selectedR.tips.map((tip, i) => {
-                                const isDone = completedTips[`${selectedR.id}-${i}`];
-                                return (
-                                  <div 
-                                    key={i} 
-                                    onClick={() => toggleTip(selectedR.id, i)}
-                                    className={`
-                                      cursor-pointer p-5 rounded-2xl border-2 transition-all duration-300 flex items-start gap-4 group
-                                      ${isDone 
-                                        ? 'bg-emerald-600 border-emerald-600 shadow-lg scale-[1.02]' 
-                                        : 'bg-white border-transparent shadow-sm hover:border-emerald-300 hover:shadow-md'}
-                                    `}
-                                  >
-                                    <div className={`
-                                      w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors mt-0.5
-                                      ${isDone ? 'bg-white border-white' : 'border-slate-300 group-hover:border-emerald-400'}
-                                    `}>
-                                      {isDone && <Check size={14} className="text-emerald-600 stroke-[3]" />}
-                                    </div>
-                                    <div>
-                                      <p className={`font-medium transition-colors text-lg ${isDone ? 'text-white' : 'text-slate-700'}`}>
-                                        {tip}
-                                      </p>
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                            
-                            <div className="mt-auto pt-8">
-                               <div className="text-center p-6 bg-white rounded-2xl border border-dashed border-slate-300">
-                                 <p className="text-sm text-slate-500 italic font-medium">"El cambio empieza con una sola acción."</p>
-                               </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* PESTAÑA: ASISTENTE MEJORADO (SIN CATEGORIAS) */}
-            {activeTab === 'wizard' && (
-              <div className="max-w-4xl mx-auto animate-in slide-in-from-right duration-500">
-                {!wizardFinished ? (
-                  <div className="text-center py-8 relative max-w-2xl mx-auto">
-                    
-                    {wizardCurrentNode !== 'start' && (
-                       <button 
-                        onClick={resetWizard}
-                        className="absolute top-0 left-0 text-slate-400 hover:text-slate-800 flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 rounded-full shadow-sm hover:shadow-md transition-all"
-                      >
-                        <ChevronLeft size={16} /> Volver al inicio
-                      </button>
-                    )}
-
-                    <div className="mb-10 inline-block mt-12">
-                      <div className="relative">
-                          <div className="absolute inset-0 bg-emerald-200 rounded-full blur-xl opacity-50 animate-pulse"></div>
-                          <div className="bg-white border-8 border-emerald-50 rounded-full p-8 shadow-2xl relative z-10">
-                              <HelpCircle size={64} className="text-emerald-600" />
-                          </div>
-                      </div>
-                    </div>
-                    
-                    <h2 className="text-4xl font-black text-slate-800 mb-6 tracking-tight">
-                      Decisión Sostenible
-                    </h2>
-                    
-                    <div className="bg-white p-8 rounded-3xl shadow-xl shadow-slate-200/50 mb-10 border border-slate-50">
-                      <p className="text-2xl text-slate-700 font-medium leading-relaxed">
-                        {wizardFlow[wizardCurrentNode] ? wizardFlow[wizardCurrentNode].question : "Cargando..."}
-                      </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-4">
-                      {wizardFlow[wizardCurrentNode]?.options.map((option, idx) => (
-                        <button 
-                          key={idx}
-                          onClick={() => handleWizardOption(option.next)}
-                          className="group bg-white hover:bg-emerald-600 hover:text-white text-slate-600 border-2 border-slate-200 hover:border-emerald-600 px-8 py-5 rounded-2xl font-bold text-xl transition-all shadow-sm hover:shadow-lg flex items-center justify-between text-left"
+            return (
+                <div className="relative w-full h-[400px] md:h-[480px] overflow-hidden rounded-3xl shadow-2xl mb-12 group">
+                    {slides.map((slide, index) => (
+                        <div 
+                            key={index}
+                            className={`absolute inset-0 transition-all duration-1000 ease-in-out ${index === current ? 'opacity-100 scale-100' : 'opacity-0 scale-105'}`}
                         >
-                          <span>{option.text}</span>
-                          <ArrowRight className="w-6 h-6 opacity-0 group-hover:opacity-100 transform -translate-x-2 group-hover:translate-x-0 transition-all" />
+                            <div 
+                                className="absolute inset-0 bg-cover bg-center"
+                                style={{ backgroundImage: `url('${slide.image}')` }}
+                            />
+                            <div className={`absolute inset-0 bg-gradient-to-r ${slide.color}`}></div>
+                            
+                            <div className="relative z-10 h-full flex flex-col justify-center px-8 md:px-16 text-white max-w-3xl">
+                                <h2 className="text-5xl md:text-7xl font-black mb-6 drop-shadow-lg leading-tight tracking-tight animate-in slide-in-from-left duration-1000">{slide.title}</h2>
+                                <div className="h-2 w-24 bg-white/50 mb-6 rounded-full"></div>
+                                <p className="text-xl md:text-3xl font-light opacity-95 drop-shadow-md animate-in fade-in duration-1000 delay-300">{slide.subtitle}</p>
+                            </div>
+                        </div>
+                    ))}
+                    
+                    <div className="absolute bottom-8 right-8 flex gap-4">
+                        <button onClick={prevSlide} className="bg-white/10 hover:bg-white/30 text-white p-4 rounded-full backdrop-blur-md transition-all border border-white/20 shadow-lg hover:scale-110">
+                            <Icons.ChevronLeft size={28} />
                         </button>
-                      ))}
+                        <button onClick={nextSlide} className="bg-white/10 hover:bg-white/30 text-white p-4 rounded-full backdrop-blur-md transition-all border border-white/20 shadow-lg hover:scale-110">
+                            <Icons.ChevronRight size={28} />
+                        </button>
                     </div>
-                  </div>
-                ) : (
-                  // RESULTADO FINAL
-                  <div className="bg-white border border-slate-100 rounded-[2.5rem] p-10 md:p-16 text-center shadow-2xl relative overflow-hidden animate-in zoom-in duration-300 max-w-3xl mx-auto">
-                    {wizardResult?.data && (
-                      <>
-                        <div className={`absolute top-0 left-0 w-full h-6 ${wizardResult.data.color.split(' ')[0]}`}></div>
+
+                    <div className="absolute bottom-8 left-8 md:left-16 flex gap-2">
+                        {slides.map((_, idx) => (
+                            <div 
+                                key={idx} 
+                                onClick={() => setCurrent(idx)}
+                                className={`h-2 rounded-full transition-all cursor-pointer shadow-sm ${idx === current ? 'bg-white w-12' : 'bg-white/40 w-3 hover:bg-white/80'}`} 
+                            />
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        // --- COMPONENTE PRINCIPAL APP ---
+        function App() {
+            const [activeTab, setActiveTab] = useState('explore'); 
+            
+            // Estados para Wizard
+            const [wizardCurrentNode, setWizardCurrentNode] = useState('start');
+            const [wizardFinished, setWizardFinished] = useState(false);
+            const [wizardResult, setWizardResult] = useState(null);
+
+            // Estados para Detalle y Tips Interactivos
+            const [selectedR, setSelectedR] = useState(null);
+            const [completedTips, setCompletedTips] = useState({});
+
+            const [searchTerm, setSearchTerm] = useState("");
+            const [dailyChallenge, setDailyChallenge] = useState(null);
+
+            const filteredRs = rData.filter(item => 
+                item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                item.examples.some(ex => ex.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                item.description.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+
+            const generateChallenge = () => {
+                const random = dailyChallenges[Math.floor(Math.random() * dailyChallenges.length)];
+                setDailyChallenge(random);
+            };
+
+            const toggleTip = (rId, tipIndex) => {
+                const key = `${rId}-${tipIndex}`;
+                setCompletedTips(prev => ({
+                    ...prev,
+                    [key]: !prev[key]
+                }));
+            };
+
+            // --- LÓGICA DEL ASISTENTE ---
+            const handleWizardOption = (nextStep) => {
+                if (nextStep.startsWith('result_')) {
+                    const rId = nextStep.replace('result_', '');
+                    const resultData = rData.find(r => r.id === rId);
+                    
+                    setWizardResult({
+                        status: 'success',
+                        data: resultData
+                    });
+                    setWizardFinished(true);
+                } else {
+                    setWizardCurrentNode(nextStep);
+                }
+            };
+
+            const resetWizard = () => {
+                setWizardCurrentNode('start');
+                setWizardFinished(false);
+                setWizardResult(null);
+            };
+
+            // Helper para renderizar iconos dinámicamente desde el string
+            const RenderIcon = ({ name, size = 24, className = "" }) => {
+                const IconComponent = Icons[name] || Icons.HelpCircle;
+                return <IconComponent size={size} className={className} />;
+            };
+
+            return (
+                <div className="min-h-screen bg-slate-50 font-sans text-slate-800 p-4 md:p-8">
+                    <div className="max-w-7xl mx-auto">
                         
-                        <div className={`inline-flex items-center justify-center w-32 h-32 rounded-full mb-8 shadow-2xl ${wizardResult.data.color}`}>
-                           {React.createElement(wizardResult.data.icon, { size: 64 })}
+                        <HeroCarousel />
+
+                        {/* Reto Diario y Dato Impactante */}
+                        <div className="mb-12 grid grid-cols-1 md:grid-cols-4 gap-6">
+                            <div className="md:col-span-3 bg-white rounded-3xl p-8 border border-slate-100 shadow-xl relative overflow-hidden flex flex-col justify-center">
+                                <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-50 rounded-full -translate-y-1/2 translate-x-1/2 opacity-50"></div>
+                                <div className="relative z-10">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="bg-yellow-100 p-2 rounded-lg text-yellow-600">
+                                        <Icons.Zap size={24} className="fill-current" />
+                                    </div>
+                                    <h3 className="text-2xl font-bold text-slate-800">Reto Eco-Diario</h3>
+                                </div>
+                                <p className="text-xl text-slate-600 mb-6 leading-relaxed">
+                                    {dailyChallenge ? dailyChallenge : "¿Te le mides a un reto sostenible hoy?"}
+                                </p>
+                                <button 
+                                    onClick={generateChallenge}
+                                    className="bg-slate-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-emerald-600 transition-colors flex items-center gap-2 w-fit shadow-lg shadow-slate-200"
+                                >
+                                    <Icons.RefreshCcw size={18} />
+                                    {dailyChallenge ? "Dame otro reto" : "Generar Reto"}
+                                </button>
+                                </div>
+                            </div>
+                            
+                            <div className="bg-gradient-to-br from-red-500 to-rose-600 p-8 rounded-3xl shadow-xl text-white flex flex-col justify-center relative overflow-hidden">
+                                <div className="absolute -bottom-4 -right-4 w-32 h-32 opacity-20 rotate-12">
+                                    <Icons.Trash2 size={128} />
+                                </div>
+                                <span className="text-white/80 text-xs font-bold uppercase tracking-widest mb-2">Dato de Impacto</span>
+                                <h4 className="text-5xl font-black mb-1">12M</h4>
+                                <p className="font-medium text-lg opacity-95 leading-tight mb-2">Toneladas de basura al año en Colombia.</p>
+                                <p className="text-sm bg-white/20 p-2 rounded-lg mt-2 inline-block backdrop-blur-sm">Solo reciclamos el 17%.</p>
+                            </div>
                         </div>
+
+                        {/* Contenedor Principal */}
+                        <div className="bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-slate-100">
                         
-                        <h2 className="text-5xl font-black text-slate-800 mb-2 tracking-tight">¡Solución Encontrada!</h2>
-                        <h3 className="text-2xl text-emerald-600 font-bold mb-8 uppercase tracking-widest">{wizardResult.data.name}</h3>
-                        
-                        <p className="text-2xl text-slate-600 mb-10 leading-relaxed font-light">{wizardResult.data.longDescription}</p>
-                        
-                        <div className="bg-slate-50 p-8 rounded-3xl mb-10 text-left border border-slate-200 shadow-inner">
-                          <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2 text-lg">
-                            <Lightbulb size={24} className="text-yellow-500 fill-current" /> Consejo Práctico:
-                          </h4>
-                          <p className="text-slate-600 mb-8 text-lg">{wizardResult.data.description}</p>
-                          
-                          <h4 className="font-bold text-slate-800 mb-4 text-xs uppercase tracking-widest">Pilas con esto:</h4>
-                          <ul className="space-y-3">
-                             {wizardResult.data.tips?.map((tip, i) => (
-                               <li key={i} className="text-slate-600 flex items-start gap-3 bg-white p-3 rounded-xl shadow-sm border border-slate-100">
-                                 <div className="min-w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 font-bold text-xs mt-0.5">!</div>
-                                 {tip}
-                               </li>
-                             ))}
-                          </ul>
+                            {/* Navegación Estilizada */}
+                            <div className="flex flex-col sm:flex-row border-b border-gray-100">
+                                <button 
+                                onClick={() => setActiveTab('explore')}
+                                className={`flex-1 py-6 text-center font-bold text-lg transition-all flex items-center justify-center gap-3 ${activeTab === 'explore' ? 'text-emerald-700 bg-emerald-50/50 border-b-4 border-emerald-500' : 'text-gray-400 hover:text-emerald-600 hover:bg-gray-50'}`}
+                                >
+                                <Icons.Lightbulb className={activeTab === 'explore' ? "fill-current" : ""} size={24} />
+                                Explorar las 9R
+                                </button>
+                                <button 
+                                onClick={() => setActiveTab('wizard')}
+                                className={`flex-1 py-6 text-center font-bold text-lg transition-all flex items-center justify-center gap-3 ${activeTab === 'wizard' ? 'text-emerald-700 bg-emerald-50/50 border-b-4 border-emerald-500' : 'text-gray-400 hover:text-emerald-600 hover:bg-gray-50'}`}
+                                >
+                                <Icons.HelpCircle className={activeTab === 'wizard' ? "fill-current" : ""} size={24} />
+                                Asistente de Decisión
+                                </button>
+                            </div>
+
+                            <div className="p-6 md:p-12 bg-slate-50/50 min-h-[600px]">
+                                
+                                {/* PESTAÑA: EXPLORAR */}
+                                {activeTab === 'explore' && (
+                                <div className="animate-in fade-in duration-500">
+                                    {!selectedR ? (
+                                    <>
+                                        <div className="flex flex-col lg:flex-row items-end justify-between mb-10 gap-6">
+                                        <div className="text-left max-w-2xl">
+                                            <h2 className="text-4xl font-black text-slate-800 mb-4 tracking-tight">La Escalera de la Sostenibilidad</h2>
+                                            <p className="text-slate-500 text-lg leading-relaxed">Cada paso cuenta. Empieza desde arriba (Rechazar) y ve bajando hasta llegar al reciclaje solo si es necesario.</p>
+                                        </div>
+                                        
+                                        <div className="relative w-full lg:w-96">
+                                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                                                <Icons.Search size={20} />
+                                            </div>
+                                            <input 
+                                            type="text" 
+                                            placeholder="Buscar (ej. icopor, ropa...)" 
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                            className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-2xl focus:ring-4 focus:ring-emerald-100 focus:border-emerald-500 focus:outline-none transition-shadow shadow-sm text-lg"
+                                            />
+                                        </div>
+                                        </div>
+
+                                        {filteredRs.length === 0 ? (
+                                        <div className="text-center py-20 opacity-50 bg-white rounded-3xl border border-dashed border-slate-300">
+                                            <div className="mx-auto mb-4 text-slate-300 w-16 h-16 flex items-center justify-center">
+                                                <Icons.Leaf size={64} />
+                                            </div>
+                                            <p className="text-xl font-medium">No encontramos resultados para "{searchTerm}"</p>
+                                            <button onClick={() => setSearchTerm("")} className="text-emerald-600 font-bold mt-2 hover:underline">Limpiar búsqueda</button>
+                                        </div>
+                                        ) : (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                            {filteredRs.map((item) => (
+                                            <div 
+                                                key={item.id} 
+                                                onClick={() => setSelectedR(item)}
+                                                className={`${item.color} group relative p-8 rounded-[2rem] cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl border-2 hover:border-black/5 flex flex-col h-full`}
+                                            >
+                                                <div className={`absolute top-0 right-0 px-4 py-2 rounded-bl-2xl rounded-tr-2xl ${item.headerColor} text-white font-bold text-xs tracking-wider uppercase shadow-sm`}>
+                                                {item.english}
+                                                </div>
+                                                
+                                                <div className="mb-6 mt-2">
+                                                <div className="bg-white w-20 h-20 rounded-2xl flex items-center justify-center shadow-md group-hover:rotate-6 transition-transform duration-300">
+                                                    <RenderIcon name={item.icon} size={40} className="opacity-90" />
+                                                </div>
+                                                </div>
+                                                
+                                                <h3 className="text-3xl font-black mb-2 tracking-tight">{item.name.split(':')[1]}</h3>
+                                                <div className="h-1.5 w-12 bg-current opacity-20 mb-4 rounded-full"></div>
+                                                <p className="text-base font-medium opacity-80 mb-8 flex-grow leading-relaxed">{item.description}</p>
+                                                
+                                                {searchTerm && (
+                                                <div className="bg-white/60 backdrop-blur-sm p-3 rounded-xl text-sm mb-6 border border-white/50">
+                                                    <span className="font-bold">Encontrado:</span> {item.examples.find(ex => ex.toLowerCase().includes(searchTerm.toLowerCase()))}
+                                                </div>
+                                                )}
+
+                                                <div className="mt-auto flex items-center text-sm font-extrabold opacity-70 group-hover:opacity-100 transition-opacity uppercase tracking-wide">
+                                                <Icons.Info size={18} className="mr-2" />
+                                                Ver Guía Completa
+                                                <div className="ml-auto transform group-hover:translate-x-2 transition-transform">
+                                                    <Icons.ArrowRight size={18} />
+                                                </div>
+                                                </div>
+                                            </div>
+                                            ))}
+                                        </div>
+                                        )}
+                                    </>
+                                    ) : (
+                                    // MODAL DE DETALLE
+                                    <div className="max-w-5xl mx-auto animate-in zoom-in-95 duration-300">
+                                        <button 
+                                        onClick={() => setSelectedR(null)}
+                                        className="mb-8 flex items-center text-slate-500 hover:text-emerald-700 font-bold text-lg transition-colors group"
+                                        >
+                                        <div className="bg-white p-2 rounded-full shadow-sm mr-3 group-hover:shadow-md transition-shadow">
+                                            <Icons.ChevronLeft size={24} /> 
+                                        </div>
+                                        Volver al listado
+                                        </button>
+
+                                        <div className="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-100">
+                                        <div className={`${selectedR.headerColor} p-10 md:p-16 text-white relative overflow-hidden`}>
+                                            <div className="absolute -right-12 -bottom-12 w-80 h-80 opacity-10 rotate-12">
+                                                <RenderIcon name={selectedR.icon} size={320} />
+                                            </div>
+                                            <div className="relative z-10">
+                                                <span className="opacity-80 font-bold tracking-widest uppercase mb-2 block">{selectedR.english}</span>
+                                                <h2 className="text-5xl md:text-7xl font-black mb-4 tracking-tight">{selectedR.name}</h2>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="p-8 md:p-12 grid grid-cols-1 lg:grid-cols-12 gap-12">
+                                            {/* COLUMNA IZQUIERDA (INFO) */}
+                                            <div className="lg:col-span-7">
+                                            <h3 className="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-3">
+                                                <div className="bg-emerald-100 p-2 rounded-lg text-emerald-600"><Icons.Info size={20} /></div>
+                                                Concepto Clave
+                                            </h3>
+                                            <p className="text-slate-600 leading-relaxed text-xl mb-10 border-l-4 border-emerald-500 pl-6">{selectedR.longDescription}</p>
+                                            
+                                            <h3 className="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+                                                <div className="bg-yellow-100 p-2 rounded-lg text-yellow-600"><Icons.Star size={20} /></div>
+                                                Beneficios
+                                            </h3>
+                                            <div className="grid grid-cols-1 gap-4 mb-10">
+                                                {selectedR.benefits.map((b, i) => (
+                                                <div key={i} className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-emerald-200 transition-colors group">
+                                                    <div className="min-w-8 h-8 rounded-full bg-white border border-emerald-100 flex items-center justify-center text-emerald-600 font-bold shadow-sm group-hover:scale-110 transition-transform">✓</div>
+                                                    <span className="text-slate-700 font-medium text-lg">{b}</span>
+                                                </div>
+                                                ))}
+                                            </div>
+
+                                            <h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-3">
+                                                <div className="bg-orange-100 p-2 rounded-lg text-orange-600"><Icons.Lightbulb size={20} /></div>
+                                                Ejemplos Reales
+                                            </h3>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                {selectedR.examples.map((ex, i) => (
+                                                <div key={i} className="flex items-start gap-3 text-slate-600 text-sm bg-slate-50 p-3 rounded-xl">
+                                                    <div className="min-w-1.5 h-1.5 rounded-full bg-orange-400 mt-2"></div>
+                                                    {ex}
+                                                </div>
+                                                ))}
+                                            </div>
+                                            </div>
+                                            
+                                            {/* COLUMNA DERECHA (INTERACTIVA) */}
+                                            <div className="lg:col-span-5 flex flex-col h-full">
+                                            <div className="bg-slate-50 p-8 rounded-[2rem] border border-slate-200 h-full shadow-inner">
+                                                <h3 className="text-xl font-bold text-slate-800 mb-2 flex items-center gap-3">
+                                                <Icons.CheckCircle className="text-emerald-600" size={24} /> 
+                                                Checklist de Acción
+                                                </h3>
+                                                <p className="text-slate-500 mb-8">Marca lo que ya aplicas en tu día a día:</p>
+                                                
+                                                <div className="space-y-4">
+                                                {selectedR.tips.map((tip, i) => {
+                                                    const isDone = completedTips[`${selectedR.id}-${i}`];
+                                                    return (
+                                                    <div 
+                                                        key={i} 
+                                                        onClick={() => toggleTip(selectedR.id, i)}
+                                                        className={`
+                                                        cursor-pointer p-5 rounded-2xl border-2 transition-all duration-300 flex items-start gap-4 group
+                                                        ${isDone 
+                                                            ? 'bg-emerald-600 border-emerald-600 shadow-lg scale-[1.02]' 
+                                                            : 'bg-white border-transparent shadow-sm hover:border-emerald-300 hover:shadow-md'}
+                                                        `}
+                                                    >
+                                                        <div className={`
+                                                        w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors mt-0.5
+                                                        ${isDone ? 'bg-white border-white' : 'border-slate-300 group-hover:border-emerald-400'}
+                                                        `}>
+                                                        {isDone && <Icons.Check size={14} className="text-emerald-600 stroke-[3]" />}
+                                                        </div>
+                                                        <div>
+                                                        <p className={`font-medium transition-colors text-lg ${isDone ? 'text-white' : 'text-slate-700'}`}>
+                                                            {tip}
+                                                        </p>
+                                                        </div>
+                                                    </div>
+                                                    );
+                                                })}
+                                                </div>
+                                                
+                                                <div className="mt-auto pt-8">
+                                                <div className="text-center p-6 bg-white rounded-2xl border border-dashed border-slate-300">
+                                                    <p className="text-sm text-slate-500 italic font-medium">"El cambio empieza con una sola acción."</p>
+                                                </div>
+                                                </div>
+                                            </div>
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    )}
+                                </div>
+                                )}
+
+                                {/* PESTAÑA: ASISTENTE MEJORADO (SIN CATEGORIAS) */}
+                                {activeTab === 'wizard' && (
+                                <div className="max-w-4xl mx-auto animate-in slide-in-from-right duration-500">
+                                    {!wizardFinished ? (
+                                    <div className="text-center py-8 relative max-w-2xl mx-auto">
+                                        
+                                        {wizardCurrentNode !== 'start' && (
+                                        <button 
+                                            onClick={resetWizard}
+                                            className="absolute top-0 left-0 text-slate-400 hover:text-slate-800 flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 rounded-full shadow-sm hover:shadow-md transition-all"
+                                        >
+                                            <Icons.ChevronLeft size={16} /> Volver al inicio
+                                        </button>
+                                        )}
+
+                                        <div className="mb-10 inline-block mt-12">
+                                        <div className="relative">
+                                            <div className="absolute inset-0 bg-emerald-200 rounded-full blur-xl opacity-50 animate-pulse"></div>
+                                            <div className="bg-white border-8 border-emerald-50 rounded-full p-8 shadow-2xl relative z-10">
+                                                <Icons.HelpCircle size={64} className="text-emerald-600" />
+                                            </div>
+                                        </div>
+                                        </div>
+                                        
+                                        <h2 className="text-4xl font-black text-slate-800 mb-6 tracking-tight">
+                                        Decisión Sostenible
+                                        </h2>
+                                        
+                                        <div className="bg-white p-8 rounded-3xl shadow-xl shadow-slate-200/50 mb-10 border border-slate-50">
+                                        <p className="text-2xl text-slate-700 font-medium leading-relaxed">
+                                            {wizardFlow[wizardCurrentNode] ? wizardFlow[wizardCurrentNode].question : "Cargando..."}
+                                        </p>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 gap-4">
+                                        {wizardFlow[wizardCurrentNode]?.options.map((option, idx) => (
+                                            <button 
+                                            key={idx}
+                                            onClick={() => handleWizardOption(option.next)}
+                                            className="group bg-white hover:bg-emerald-600 hover:text-white text-slate-600 border-2 border-slate-200 hover:border-emerald-600 px-8 py-5 rounded-2xl font-bold text-xl transition-all shadow-sm hover:shadow-lg flex items-center justify-between text-left"
+                                            >
+                                            <span>{option.text}</span>
+                                            <div className="w-6 h-6 opacity-0 group-hover:opacity-100 transform -translate-x-2 group-hover:translate-x-0 transition-all">
+                                                <Icons.ArrowRight size={24} />
+                                            </div>
+                                            </button>
+                                        ))}
+                                        </div>
+                                    </div>
+                                    ) : (
+                                    // RESULTADO FINAL
+                                    <div className="bg-white border border-slate-100 rounded-[2.5rem] p-10 md:p-16 text-center shadow-2xl relative overflow-hidden animate-in zoom-in duration-300 max-w-3xl mx-auto">
+                                        {wizardResult?.data && (
+                                        <>
+                                            <div className={`absolute top-0 left-0 w-full h-6 ${wizardResult.data.color.split(' ')[0]}`}></div>
+                                            
+                                            <div className={`inline-flex items-center justify-center w-32 h-32 rounded-full mb-8 shadow-2xl ${wizardResult.data.color}`}>
+                                            <RenderIcon name={wizardResult.data.icon} size={64} />
+                                            </div>
+                                            
+                                            <h2 className="text-5xl font-black text-slate-800 mb-2 tracking-tight">¡Solución Encontrada!</h2>
+                                            <h3 className="text-2xl text-emerald-600 font-bold mb-8 uppercase tracking-widest">{wizardResult.data.name}</h3>
+                                            
+                                            <p className="text-2xl text-slate-600 mb-10 leading-relaxed font-light">{wizardResult.data.longDescription}</p>
+                                            
+                                            <div className="bg-slate-50 p-8 rounded-3xl mb-10 text-left border border-slate-200 shadow-inner">
+                                            <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2 text-lg">
+                                                <Icons.Lightbulb size={24} className="text-yellow-500 fill-current" /> Consejo Práctico:
+                                            </h4>
+                                            <p className="text-slate-600 mb-8 text-lg">{wizardResult.data.description}</p>
+                                            
+                                            <h4 className="font-bold text-slate-800 mb-4 text-xs uppercase tracking-widest">Pilas con esto:</h4>
+                                            <ul className="space-y-3">
+                                                {wizardResult.data.tips?.map((tip, i) => (
+                                                <li key={i} className="text-slate-600 flex items-start gap-3 bg-white p-3 rounded-xl shadow-sm border border-slate-100">
+                                                    <div className="min-w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 font-bold text-xs mt-0.5">!</div>
+                                                    {tip}
+                                                </li>
+                                                ))}
+                                            </ul>
+                                            </div>
+                                        </>
+                                        )}
+
+                                        <button 
+                                        onClick={resetWizard}
+                                        className="bg-slate-900 hover:bg-black text-white px-10 py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 mx-auto shadow-xl hover:scale-105"
+                                        >
+                                        <Icons.RotateCcw className="w-5 h-5" />
+                                        Analizar otro objeto
+                                        </button>
+                                    </div>
+                                    )}
+                                </div>
+                                )}
+
+                            </div>
                         </div>
-                      </>
-                    )}
 
-                    <button 
-                      onClick={resetWizard}
-                      className="bg-slate-900 hover:bg-black text-white px-10 py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 mx-auto shadow-xl hover:scale-105"
-                    >
-                      <RotateCcw className="w-5 h-5" />
-                      Analizar otro objeto
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
+                        {/* Footer */}
+                        <div className="mt-12 text-center pb-8">
+                            <p className="text-slate-400 font-medium">Hecho con 💚 para una Colombia más limpia.</p>
+                        </div>
 
-          </div>
-        </div>
+                    </div>
+                </div>
+            );
+        }
 
-        {/* Footer */}
-        <div className="mt-12 text-center pb-8">
-            <p className="text-slate-400 font-medium">Hecho con 💚 para una Colombia más limpia.</p>
-        </div>
-
-      </div>
-    </div>
-  );
-}
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
