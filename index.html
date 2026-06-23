@@ -3,1133 +3,622 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Colombia Sostenible</title>
+    <title>Eco-Brújula 9R | Colombia Sostenible</title>
     
     <!-- React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     
-    <!-- Babel para JSX -->
+    <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script>
+        Babel.registerPreset('react-classic', {
+            presets: [
+                [Babel.availablePresets.react, { runtime: 'classic' }]
+            ]
+        });
+    </script>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Fuente Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        /* Animaciones personalizadas */
-        .animate-in { animation: fadeIn 0.5s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .slide-up { animation: slideUp 0.4s ease-out forwards; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #f8fafc;
+            overflow-x: hidden;
+        }
+        
+        /* Animaciones base */
+        .animate-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .slide-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        @keyframes fadeIn { 
+            from { opacity: 0; } 
+            to { opacity: 1; } 
+        }
+        @keyframes slideUp { 
+            from { opacity: 0; transform: translateY(30px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
+        /* Utilidades Glassmorphism Premium */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08);
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 20px -2px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.8);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px -4px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 255, 255, 1);
+        }
+
+        /* Fondos Animados (Blobs) */
+        .blob-container {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+            background: #f1f5f9;
+        }
+        .blob {
+            position: absolute;
+            filter: blur(90px);
+            opacity: 0.6;
+            animation: float 20s infinite ease-in-out alternate;
+        }
+        .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: #a7f3d0; animation-delay: 0s; }
+        .blob-2 { top: 40%; right: -10%; width: 40vw; height: 40vw; background: #bae6fd; animation-delay: -5s; }
+        .blob-3 { bottom: -20%; left: 20%; width: 60vw; height: 60vw; background: #fef08a; opacity: 0.4; animation-delay: -10s; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(5%, 10%) scale(1.1); }
+            100% { transform: translate(-5%, 5%) scale(0.9); }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body class="text-slate-800 antialiased min-h-screen">
+    <!-- Blobs de fondo -->
+    <div class="blob-container">
+        <div class="blob blob-1 rounded-full"></div>
+        <div class="blob blob-2 rounded-full"></div>
+        <div class="blob blob-3 rounded-full"></div>
+    </div>
+
     <div id="root"></div>
 
-    <script type="text/babel">
+    <script type="text/babel" data-presets="env,react-classic">
         const { useState, useEffect } = React;
 
-        // --- ICONOS (LUCIDE REPLICA) ---
         const Icons = {
-            ArrowRight: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>,
-            RotateCcw: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>,
-            Trash2: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>,
-            Wrench: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>,
-            Scissors: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" x2="8.12" y1="4" y2="15.88"/><line x1="14.47" x2="20" y1="14.48" y2="20"/><line x1="8.12" x2="12" y1="8.12" y2="12"/></svg>,
-            RefreshCw: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>,
-            PackageX: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"/><path d="m7.5 4.27 9 5.15"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" x2="12" y1="22" y2="12"/><path d="m17 13 5 5m-5 0 5-5"/></svg>,
-            Lightbulb: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-1 1.5-2.4 1.5-3.8 0-3.2-2.8-6-6-6S6 4.8 6 8c0 1.4.5 2.8 1.5 3.8.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>,
-            TrendingDown: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>,
-            ShoppingBag: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>,
-            CheckCircle: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>,
-            XCircle: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>,
-            Leaf: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>,
-            ChevronLeft: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m15 18-6-6 6-6"/></svg>,
-            ChevronRight: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m9 18 6-6-6-6"/></svg>,
-            Info: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>,
-            Heart: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>,
-            Award: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>,
-            Search: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>,
-            Zap: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
-            RefreshCcw: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v-5"/></svg>,
-            RotateCcw: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>,
-            Check: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="20 6 9 17 4 12"/></svg>,
-            Star: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
-            HelpCircle: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>,
-            MapPin: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>,
-            Brain: ({size=24, className}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>
+            ArrowRight: ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>,
+            RotateCcw: ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>,
+            Trash2: ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>,
+            Wrench: ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>,
+            Scissors: ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" x2="8.12" y1="4" y2="15.88"/><line x1="14.47" x2="20" y1="14.48" y2="20"/><line x1="8.12" x2="12" y1="8.12" y2="12"/></svg>,
+            RefreshCw: ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>,
+            PackageX: ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"/><path d="m7.5 4.27 9 5.15"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" x2="12" y1="22" y2="12"/><path d="m17 13 5 5m-5 0 5-5"/></svg>,
+            Lightbulb: ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-1 1.5-2.4 1.5-3.8 0-3.2-2.8-6-6-6S6 4.8 6 8c0 1.4.5 2.8 1.5 3.8.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>,
+            TrendingDown: ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>,
+            ShoppingBag: ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>,
+            CheckCircle: ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>,
+            XCircle: ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>,
+            Leaf: ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 12"/></svg>,
+            ChevronLeft: ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m15 18-6-6 6-6"/></svg>,
+            ChevronRight: ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m9 18 6-6-6-6"/></svg>,
+            Info: ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>,
+            Search: ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>,
+            Zap: ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
+            RefreshCcw: ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v-5"/></svg>,
+            Check: ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="20 6 9 17 4 12"/></svg>,
+            Star: ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
+            HelpCircle: ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>,
+            Brain: ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>,
+            Award: ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
         };
 
-        // --- DATOS PRINCIPALES (CONTEXTO COLOMBIA) ---
         const rData = [
             {
-                id: 'r0',
-                name: 'R0: Rechazar',
-                english: 'Refuse',
+                id: 'r0', name: 'R0: Rechazar', english: 'Refuse',
                 description: 'La decisión más tesa: decir "no" a lo que no necesitas.',
                 longDescription: 'Rechazar es evitar el problema antes de que entre a tu casa. En Colombia generamos toneladas de basura que podríamos evitar diciendo "no gracias" amablemente.',
-                icon: 'PackageX',
-                color: 'bg-red-50 text-red-700 border-red-200',
-                headerColor: 'bg-red-600',
-                examples: [
-                    'Decir "sin pitillo, por favor" en el restaurante.',
-                    'Rechazar volantes y publicidad en la calle.',
-                    'No recibir bolsas plásticas en la tienda de barrio (lleva la tuya de tela).',
-                    'Evitar comprar frutas envueltas en icopor y vinipel innecesario.'
-                ],
+                icon: 'PackageX', color: 'from-rose-500 to-red-600', textLight: 'text-rose-50', textDark: 'text-rose-600',
+                image: 'https://images.pexels.com/photos/2768961/pexels-photo-2768961.jpeg?auto=compress&cs=tinysrgb&w=1600',
+                examples: ['Decir "sin pitillo, por favor".', 'Rechazar volantes en la calle.', 'No recibir bolsas plásticas.', 'Evitar frutas envueltas en icopor.'],
                 benefits: ['Ahorras plata de una.', 'Menos basura en la bolsa negra.', 'No llenas la casa de "chécheres".'],
-                tips: ['Lleva siempre tu bolsa ecológica al D1, Ara, Éxito, etc.', 'Pide la factura digital o al correo.', 'Evita los "regalos" promocionales que van directo a la basura.']
+                tips: ['Lleva siempre tu bolsa ecológica.', 'Pide la factura digital o al correo.', 'Evita regalos promocionales inútiles.']
             },
             {
-                id: 'r1',
-                name: 'R1: Repensar',
-                english: 'Rethink',
+                id: 'r1', name: 'R1: Repensar', english: 'Rethink',
                 description: 'Cambiar el chip: compartir en vez de comprar.',
                 longDescription: 'Repensar es cuestionar nuestros hábitos. ¿Para qué comprar algo que voy a usar dos veces? Mejor busquemos alternativas comunitarias o digitales.',
-                icon: 'Lightbulb',
-                color: 'bg-orange-50 text-orange-700 border-orange-200',
-                headerColor: 'bg-orange-500',
-                examples: [
-                    'Compartir carro con compañeros (Carpooling) para evitar el Pico y Placa.',
-                    'Ir a la biblioteca (como la Luis Ángel Arango o bibliotecas públicas) en vez de comprar libros.',
-                    'Alquilar herramientas para arreglos puntuales.',
-                    'Usar la copa menstrual.'
-                ],
-                benefits: ['Acceso a cosas mejores pagando menos.', 'Haces comunidad con tus vecinos.', 'Ayudas a descongestionar la ciudad.'],
-                tips: ['Antes de comprar, pregunta en el grupo de WhatsApp de la familia.', 'Usa apps de transporte compartido.', 'Pásate a facturas digitales.']
+                icon: 'Lightbulb', color: 'from-amber-400 to-orange-500', textLight: 'text-amber-50', textDark: 'text-amber-600',
+                image: 'https://images.pexels.com/photos/3735169/pexels-photo-3735169.jpeg?auto=compress&cs=tinysrgb&w=1600',
+                examples: ['Compartir carro (Carpooling).', 'Ir a bibliotecas públicas.', 'Alquilar herramientas.', 'Usar la copa menstrual.'],
+                benefits: ['Acceso a cosas mejores pagando menos.', 'Haces comunidad con tus vecinos.', 'Ayudas a descongestionar.'],
+                tips: ['Pregunta en grupos antes de comprar.', 'Usa apps de transporte compartido.', 'Pásate a facturas digitales.']
             },
             {
-                id: 'r2',
-                name: 'R2: Reducir',
-                english: 'Reduce',
+                id: 'r2', name: 'R2: Reducir', english: 'Reduce',
                 description: 'Bajarle al consumo. Menos es más.',
                 longDescription: 'Si no puedes rechazarlo, úsalo menos. Se trata de eficiencia: que los servicios públicos no lleguen caros y generar menos desperdicio.',
-                icon: 'TrendingDown',
-                color: 'bg-yellow-50 text-yellow-700 border-yellow-200',
-                headerColor: 'bg-yellow-500',
-                examples: [
-                    'Mercar a granel llevando tus propios tarros.',
-                    'Imprimir por ambos lados de la hoja.',
-                    'Bañarse rápido (cierra la llave mientras te enjabonas).',
-                    'Cambiar los bombillos viejos por LED.'
-                ],
-                benefits: ['El recibo de la luz y el agua llegan más baratos.', 'Menos bolsas de basura que sacar.', 'Vida más simple.'],
-                tips: ['Compra repuestos tipo "doypack" (bolsa) para rellenar tus tarros.', 'Apoya la moda lenta colombiana.', 'Planifica el almuerzo para no botar comida.']
+                icon: 'TrendingDown', color: 'from-yellow-400 to-amber-500', textLight: 'text-yellow-50', textDark: 'text-yellow-600',
+                image: 'https://images.pexels.com/photos/259280/pexels-photo-259280.jpeg?auto=compress&cs=tinysrgb&w=1600',
+                examples: ['Mercar a granel en tus propios tarros.', 'Imprimir por ambos lados.', 'Bañarse rápido.', 'Cambiar a bombillos LED.'],
+                benefits: ['Recibos más baratos.', 'Menos bolsas de basura que sacar.', 'Vida más simple.'],
+                tips: ['Compra repuestos tipo "doypack".', 'Apoya la moda lenta colombiana.', 'Planifica para no botar comida.']
             },
             {
-                id: 'r3',
-                name: 'R3: Reutilizar',
-                english: 'Reuse',
+                id: 'r3', name: 'R3: Reutilizar', english: 'Reuse',
                 description: 'Darle palo a las cosas hasta que se acaben.',
                 longDescription: 'Combate la cultura de "usar y tirar". Las abuelas colombianas son expertas en esto: el tarro de galletas se vuelve costurero.',
-                icon: 'ShoppingBag',
-                color: 'bg-lime-50 text-lime-700 border-lime-200',
-                headerColor: 'bg-lime-600',
-                examples: [
-                    'Usar los frascos de café para guardar condimentos.',
-                    'Comprar o vender ropa de segunda.',
-                    'Usar cajas de zapatos para organizar el armario.',
-                    'Rellenar la botella de agua en vez de comprar una nueva.'
-                ],
-                benefits: ['Ahorras plata.', 'Ayudas a gente que lo necesita.', 'Menos basura al relleno Doña Juana (o el de tu ciudad).'],
-                tips: ['Vende lo que no uses.', 'Carga siempre tu termo.', 'Usa trapos viejos para limpiar en vez de toallas de papel.']
+                icon: 'ShoppingBag', color: 'from-lime-400 to-green-500', textLight: 'text-lime-50', textDark: 'text-lime-600',
+                image: 'https://images.pexels.com/photos/45982/pexels-photo-45982.jpeg?auto=compress&cs=tinysrgb&w=1600',
+                examples: ['Usar frascos para condimentos.', 'Ropa de segunda.', 'Cajas de zapatos para organizar.', 'Rellenar tu termo de agua.'],
+                benefits: ['Ahorras plata.', 'Ayudas a gente que lo necesita.', 'Menos basura al relleno sanitario.'],
+                tips: ['Vende lo que no uses.', 'Carga siempre tu termo.', 'Usa trapos viejos para limpiar.']
             },
             {
-                id: 'r4',
-                name: 'R4: Reparar',
-                english: 'Repair',
+                id: 'r4', name: 'R4: Reparar', english: 'Repair',
                 description: 'Arreglar lo dañado. No lo botes, repáralo.',
                 longDescription: 'En Colombia somos recursivos. Reparar apoya la economía local y evita comprar cosas nuevas innecesarias.',
-                icon: 'Wrench',
-                color: 'bg-green-50 text-green-700 border-green-200',
-                headerColor: 'bg-green-600',
-                examples: [
-                    'Zurcir las medias o pantalones.',
-                    'Cambiarle la pila al reloj o al celular.',
-                    'Pegar la oreja del pocillo favorito.',
-                    'Llevar los tenis al zapatero para cambio de suela.'
-                ],
-                benefits: ['Tus cosas duran más.', 'Apoyas al zapatero y costurera del barrio.', 'Orgullo de arreglarlo tú mismo.'],
-                tips: ['Busca tutoriales en YouTube.', 'Ten aguja e hilo a la mano.', 'Ubica los talleres de reparación en tu barrio.']
+                icon: 'Wrench', color: 'from-emerald-400 to-teal-500', textLight: 'text-emerald-50', textDark: 'text-emerald-600',
+                image: 'https://images.pexels.com/photos/221164/pexels-photo-221164.jpeg?auto=compress&cs=tinysrgb&w=1600',
+                examples: ['Zurcir pantalones.', 'Cambiarle la pila al reloj.', 'Pegar la oreja del pocillo.', 'Llevar los tenis al zapatero.'],
+                benefits: ['Tus cosas duran más.', 'Apoyas al comercio de barrio.', 'Orgullo de arreglarlo tú mismo.'],
+                tips: ['Busca tutoriales en YouTube.', 'Ten aguja e hilo.', 'Ubica los talleres de reparación.']
             },
             {
-                id: 'r5',
-                name: 'R5: Restaurar',
-                english: 'Refurbish',
+                id: 'r5', name: 'R5: Restaurar', english: 'Refurbish',
                 description: 'Engallar o renovar para que quede como nuevo.',
                 longDescription: 'Mejora el aspecto y funcionalidad. Es darle una segunda juventud a ese mueble o aparato viejo.',
-                icon: 'RefreshCw',
-                color: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-                headerColor: 'bg-emerald-600',
-                examples: [
-                    'Pintar muebles de madera antiguos.',
-                    'Retapizar el sofá de la sala.',
-                    'Ponerle un disco duro estado sólido al PC viejo.',
-                    'Restaurar una bicicleta antigua.'
-                ],
-                benefits: ['Tienes cosas únicas.', 'Sale más barato que comprar nuevo.', 'Conservas objetos con historia.']
+                icon: 'RefreshCw', color: 'from-teal-400 to-cyan-500', textLight: 'text-teal-50', textDark: 'text-teal-600',
+                image: 'https://images.pexels.com/photos/1130498/pexels-photo-1130498.jpeg?auto=compress&cs=tinysrgb&w=1600',
+                examples: ['Pintar muebles de madera.', 'Retapizar el sofá.', 'Ponerle un SSD al PC viejo.', 'Restaurar una bicicleta.'],
+                benefits: ['Tienes cosas únicas.', 'Sale más barato.', 'Conservas objetos con historia.'],
+                tips: ['Lija bien antes de pintar.', 'Usa repuestos compatibles.', 'Disfruta el proceso creativo.']
             },
             {
-                id: 'r6',
-                name: 'R6: Remanufacturar',
-                english: 'Remanufacture',
+                id: 'r6', name: 'R6: Remanufacturar', english: 'Remanufacture',
                 description: 'Reconstruir industrialmente con garantía.',
                 longDescription: 'Esto es más industrial. Se usan partes buenas para ensamblar productos que se venden con garantía.',
-                icon: 'RotateCcw',
-                color: 'bg-teal-50 text-teal-700 border-teal-200',
-                headerColor: 'bg-teal-600',
-                examples: [
-                    'Motores y alternadores reconstruidos.',
-                    'Cartuchos de impresora recargados originales.',
-                    'Celulares "reacondicionados" certificados.',
-                    'Mobiliario de oficina modular.'
-                ],
-                benefits: ['Garantía real.', 'Precio mucho más bajo.', 'Ahorro gigante de recursos industriales.']
+                icon: 'RotateCcw', color: 'from-cyan-400 to-blue-500', textLight: 'text-cyan-50', textDark: 'text-cyan-600',
+                image: 'https://images.pexels.com/photos/3862130/pexels-photo-3862130.jpeg?auto=compress&cs=tinysrgb&w=1600',
+                examples: ['Motores reconstruidos.', 'Cartuchos recargados originales.', 'Celulares "reacondicionados".', 'Mobiliario modular.'],
+                benefits: ['Garantía real.', 'Precio bajo.', 'Ahorro gigante de recursos industriales.'],
+                tips: ['Busca el sello de "Refurbished".', 'Exige garantía.', 'Compra en sitios reconocidos.']
             },
             {
-                id: 'r7',
-                name: 'R7: Reutilizar (Otro fin)',
-                english: 'Repurpose',
+                id: 'r7', name: 'R7: Reinventar', english: 'Repurpose',
                 description: 'Reinventar: de basura a tesoro (Upcycling).',
                 longDescription: 'Pura creatividad criolla. Usar algo para lo que no fue diseñado, pero que funciona perfecto.',
-                icon: 'Scissors',
-                color: 'bg-cyan-50 text-cyan-700 border-cyan-200',
-                headerColor: 'bg-cyan-600',
-                examples: [
-                    'Llantas viejas como materas.',
-                    'Estibas (palets) convertidas en camas o mesas.',
-                    'Botellas plásticas como "ladrillos ecológicos".',
-                    'Hacer traperos con ropa vieja.'
-                ],
-                benefits: ['Explotas tu creatividad.', 'Decoración barata y original.', 'Evitas que vaya al relleno sanitario.']
+                icon: 'Scissors', color: 'from-blue-400 to-indigo-500', textLight: 'text-blue-50', textDark: 'text-blue-600',
+                image: 'https://images.pexels.com/photos/1209355/pexels-photo-1209355.jpeg?auto=compress&cs=tinysrgb&w=1600',
+                examples: ['Llantas como materas.', 'Estibas como camas.', 'Botellas plásticas como ladrillos.', 'Traperos con ropa vieja.'],
+                benefits: ['Explotas tu creatividad.', 'Decoración barata.', 'Evitas el relleno sanitario.'],
+                tips: ['Pinterest es tu mejor amigo.', 'Asegúrate que sea seguro usarlo.', 'Involucra a los niños.']
             },
             {
-                id: 'r8',
-                name: 'R8: Reciclar',
-                english: 'Recycle',
+                id: 'r8', name: 'R8: Reciclar', english: 'Recycle',
                 description: 'Separar para transformar. La última opción.',
                 longDescription: 'Si ya no pudiste hacer nada de lo anterior, sepáralo bien para que los recicladores de oficio puedan aprovecharlo.',
-                icon: 'Trash2',
-                color: 'bg-blue-50 text-blue-700 border-blue-200',
-                headerColor: 'bg-blue-600',
-                examples: [
-                    'Bolsa BLANCA: Plástico, vidrio, metal, papel, cartón (limpios).',
-                    'Bolsa VERDE: Restos de comida (si aplica en tu municipio).',
-                    'Bolsa NEGRA: Icopor sucio, servilletas, papel higiénico.',
-                    'Puntos Pila: Baterías y celulares viejos.'
-                ],
+                icon: 'Trash2', color: 'from-indigo-400 to-purple-500', textLight: 'text-indigo-50', textDark: 'text-indigo-600',
+                image: 'https://images.pexels.com/photos/3184423/pexels-photo-3184423.jpeg?auto=compress&cs=tinysrgb&w=1600',
+                examples: ['Bolsa BLANCA: Limpio.', 'Bolsa VERDE: Orgánicos.', 'Bolsa NEGRA: No aprovechable.', 'Puntos Pila especiales.'],
                 benefits: ['Dignificas el trabajo del reciclador.', 'Ahorras materia prima.', 'Cumples la ley.'],
-                tips: ['Lava y seca los envases antes de botarlos.', 'Aplasta las botellas y cajas.', 'Entrega la bolsa blanca directamente al reciclador si puedes.']
+                tips: ['Lava y seca los envases.', 'Aplasta las botellas.', 'Entrega la bolsa blanca en mano.']
             }
         ];
 
-        // --- DATOS TRIVIA (20 PREGUNTAS) ---
         const triviaData = [
-            {
-                id: 1,
-                question: "Acabas de comerte una pizza y la caja está llena de grasa. ¿Dónde la botas?",
-                options: ["Bolsa Blanca (Reciclable)", "Bolsa Negra (No Aprovechable)", "Bolsa Verde (Orgánico)"],
-                correct: 1,
-                feedback: "¡Correcto! El cartón engrasado pierde su capacidad de reciclaje. Debe ir a la bolsa negra.",
-                wrongFeedback: "¡Ojo! La grasa contamina el cartón y daña el reciclaje. Va a la bolsa negra."
-            },
-            {
-                id: 2,
-                question: "¿Qué debes hacer con el aceite de cocina usado?",
-                options: ["Botarlo por el sifón con agua caliente", "Echarlo a la tierra", "Guardarlo en una botella y llevarlo a un punto de recolección"],
-                correct: 2,
-                feedback: "¡Excelente! 1 litro de aceite contamina 1.000 litros de agua. ¡Nunca al sifón!",
-                wrongFeedback: "¡Pilas! El aceite tapa tuberías y contamina ríos. Guárdalo y busca un punto de recolección."
-            },
-            {
-                id: 3,
-                question: "¿Cuál es el color de bolsa para los residuos orgánicos (cáscaras, sobras) en Colombia?",
-                options: ["Verde", "Azul", "Gris"],
-                correct: 0,
-                feedback: "¡Así es! La bolsa verde es para residuos orgánicos aprovechables.",
-                wrongFeedback: "Incorrecto. Según el código de colores, la bolsa VERDE es para orgánicos."
-            },
-            {
-                id: 4,
-                question: "Tienes una botella plástica. ¿Paso correcto antes de botarla?",
-                options: ["Botarla tal cual a la negra", "Lavar, secar, aplastar -> Bolsa Blanca", "Llenarla de basura"],
-                correct: 1,
-                feedback: "¡Muy bien! Limpio, Seco y Aplastado es la regla de oro.",
-                wrongFeedback: "Para que se aproveche, debe estar limpia y seca en la bolsa blanca."
-            },
-            {
-                id: 5,
-                question: "¿Qué significa la primera R de la economía circular?",
-                options: ["Reciclar", "Reutilizar", "Rechazar"],
-                correct: 2,
-                feedback: "¡Esa es la actitud! Rechazar lo innecesario es lo más importante.",
-                wrongFeedback: "La primera y más importante es RECHAZAR el residuo desde el inicio."
-            },
-            {
-                id: 6,
-                question: "¿Qué haces con medicamentos vencidos o que ya no usas?",
-                options: ["Bolsa Negra", "Inodoro", "Puntos Azules en droguerías/supermercados"],
-                correct: 2,
-                feedback: "¡Exacto! Los Puntos Azules garantizan su destrucción segura sin contaminar aguas.",
-                wrongFeedback: "Nunca a la basura ni al agua. Busca los contenedores 'Punto Azul'."
-            },
-            {
-                id: 7,
-                question: "¿Dónde se botan las pilas AA o AAA?",
-                options: ["Bolsa Blanca", "Bolsa Negra", "Contenedores 'Pilas con el Ambiente'"],
-                correct: 2,
-                feedback: "¡Correcto! Las pilas tienen metales pesados y requieren gestión especial.",
-                wrongFeedback: "¡Peligro! Las pilas contaminan mucho. Llévalas a puntos de recolección en centros comerciales."
-            },
-            {
-                id: 8,
-                question: "¿El icopor sucio de comida dónde va?",
-                options: ["Bolsa Blanca", "Bolsa Negra", "Bolsa Verde"],
-                correct: 1,
-                feedback: "Lamentablemente, el icopor sucio es muy difícil de recuperar. Va a la negra.",
-                wrongFeedback: "Al estar sucio pierde valor. Debe ir a la bolsa negra de no aprovechables."
-            },
-            {
-                id: 9,
-                question: "¿Cómo reciclar cajas de Tetra Pak (leche/jugos)?",
-                options: ["Bolsa Negra directo", "Escurrir, aplastar y Bolsa Blanca", "Quemar en el patio"],
-                correct: 1,
-                feedback: "¡Sí! El Tetra Pak se recicla para hacer mobiliario escolar y techos.",
-                wrongFeedback: "Son reciclables si están escurridos y aplastados en la bolsa blanca."
-            },
-            {
-                id: 10,
-                question: "Se rompió un espejo o un vaso de cerámica. ¿Dónde va?",
-                options: ["Bolsa Blanca (Vidrio)", "Bolsa Negra (envuelto en periódico)", "Suelo"],
-                correct: 1,
-                feedback: "¡Ojo! Espejos y cerámica NO son vidrio reciclable. Van a la negra, envueltos por seguridad.",
-                wrongFeedback: "No se reciclan con el vidrio de botellas. Van a la negra, envueltos para no cortar al recolector."
-            },
-            {
-                id: 11,
-                question: "¿Qué hacer con bombillos ahorradores o tubos fluorescentes?",
-                options: ["Bolsa Negra con cuidado", "Puntos de recolección Lumina/Posconsumo", "Bolsa Blanca"],
-                correct: 1,
-                feedback: "¡Bien! Contienen mercurio y necesitan disposición especial.",
-                wrongFeedback: "Tienen mercurio peligroso. No van a la basura normal. Busca puntos Lumina."
-            },
-            {
-                id: 12,
-                question: "¿Cuál es uno de los mayores impactos del 'Fast Fashion' (Moda Rápida)?",
-                options: ["Ninguno", "Consumo excesivo de agua y contaminación", "Mejora el aire"],
-                correct: 1,
-                feedback: "Correcto. La industria textil es de las más contaminantes del mundo.",
-                wrongFeedback: "La moda rápida gasta muchísima agua y genera microplásticos."
-            },
-            {
-                id: 13,
-                question: "¿Cuánto tarda aprox. una botella de plástico en descomponerse?",
-                options: ["1 año", "50 años", "Hasta 500 años"],
-                correct: 2,
-                feedback: "Triste pero cierto. Por eso es vital Rechazar y Reducir.",
-                wrongFeedback: "Es mucho más... cerca de 500 años persistiendo en el ambiente."
-            },
-            {
-                id: 14,
-                question: "¿Dónde van las colillas de cigarrillo?",
-                options: ["Al suelo", "Bolsa Blanca", "Bolsa Negra (bien apagadas)"],
-                correct: 2,
-                feedback: "¡Sí! Son residuos peligrosos no aprovechables. Nunca al suelo.",
-                wrongFeedback: "Van a la bolsa negra. Una sola colilla contamina litros de agua."
-            },
-            {
-                id: 15,
-                question: "Papel higiénico, servilletas usadas y pañales. ¿Bolsa?",
-                options: ["Bolsa Negra", "Bolsa Verde", "Bolsa Blanca"],
-                correct: 0,
-                feedback: "Correcto. Son residuos sanitarios no aprovechables.",
-                wrongFeedback: "Estos siempre van a la bolsa negra (residuos ordinarios/sanitarios)."
-            },
-            {
-                id: 16,
-                question: "¿Qué es un RAEE?",
-                options: ["Un pájaro", "Residuo de Aparatos Eléctricos y Electrónicos", "Una marca de jabón"],
-                correct: 1,
-                feedback: "Así es. Computadores, neveras, secadores... tienen gestión diferenciada.",
-                wrongFeedback: "Significa Residuos de Aparatos Eléctricos y Electrónicos. Requieren puntos EcoCómputo."
-            },
-            {
-                id: 17,
-                question: "¿Cuál es la diferencia entre Reciclar y Reutilizar?",
-                options: ["Son lo mismo", "Reutilizar es usar de nuevo; Reciclar es transformar industrialmente", "Reciclar es lavar"],
-                correct: 1,
-                feedback: "Exacto. Reutilizar alarga la vida; Reciclar crea nueva materia prima.",
-                wrongFeedback: "Reutilizar es darle otro uso (botella->termo). Reciclar implica proceso industrial (botella->fibra)."
-            },
-            {
-                id: 18,
-                question: "¿Cómo se llama el símbolo universal del reciclaje?",
-                options: ["Círculo de la Vida", "Triángulo de Moebius", "Cuadrado Verde"],
-                correct: 1,
-                feedback: "¡Cultura general! Las tres flechas representan: Recoger, Procesar, Comprar reciclado.",
-                wrongFeedback: "Es el Triángulo de Moebius (o Möbius)."
-            },
-            {
-                id: 19,
-                question: "Tapabocas y guantes desechables. ¿Dónde van?",
-                options: ["Bolsa Blanca", "Bolsa Negra", "Bolsa Verde"],
-                correct: 1,
-                feedback: "Por bioseguridad y material, van a la bolsa negra.",
-                wrongFeedback: "Son residuos biosanitarios no reciclables. Van a la negra."
-            },
-            {
-                id: 20,
-                question: "¿A quién ayudas principalmente cuando separas bien en la Bolsa Blanca?",
-                options: ["Al camión de basura", "A los Recicladores de Oficio", "A nadie"],
-                correct: 1,
-                feedback: "¡El corazón del sistema! Dignificas su trabajo y aumentas sus ingresos.",
-                wrongFeedback: "Ayudas directamente a los Recicladores de Oficio, que viven de recuperar este material."
-            }
+            { id: 1, question: "Caja de pizza con grasa. ¿Dónde va?", options: ["Bolsa Blanca", "Bolsa Negra", "Bolsa Verde"], correct: 1, feedback: "El cartón con grasa pierde capacidad de reciclaje. Va a la negra." },
+            { id: 2, question: "¿Aceite de cocina usado?", options: ["Al sifón", "A la tierra", "Guardar en botella para recolección"], correct: 2, feedback: "1 litro de aceite contamina 1.000 litros de agua." },
+            { id: 3, question: "Color de bolsa para residuos orgánicos:", options: ["Verde", "Azul", "Gris"], correct: 0, feedback: "La bolsa verde es para orgánicos aprovechables (compost)." },
+            { id: 4, question: "Paso antes de botar una botella plástica:", options: ["Botarla directo", "Lavar, secar, aplastar -> Blanca", "Llenarla de basura"], correct: 1, feedback: "Limpio, seco y aplastado es la regla de oro del reciclaje." },
+            { id: 5, question: "Primera 'R' de la economía circular:", options: ["Reciclar", "Reutilizar", "Rechazar"], correct: 2, feedback: "Rechazar lo innecesario ataca el problema de raíz." }
         ];
 
         const dailyChallenges = [
-            "Desconecta todos los aparatos electrónicos que no estés usando (cargadores, microondas, consolas en stand-by).",
-            "Revisa qué ropa no usas y sepárala para regalar o vender.",
-            "Intenta bañarte en lo que dura tu canción favorita (aprox. 3-4 minutos) para ahorrar agua caliente y gas/energía.",
-            "Ve a la tienda o supermercado con tu propia bolsa de tela.",
-            "Ese cajón que no cierra bien... ¡arréglalo hoy!",
-            "Haz un 'calentado' con lo que sobró del almuerzo de ayer.",
-            "Desenchufa el cargador del celular si no lo estás usando.",
-            "Reduce el brillo de tu monitor y celular al nivel mínimo cómodo para ahorrar batería y energía.",
-            "Al cepillarte los dientes o enjabonarte las manos, cierra la llave. No dejes correr el agua.",
-            "Revisa los grifos y el inodoro de tu casa. Si ves una gota, ¡arréglala hoy!",
-            "Si lavas frutas o verduras, usa un recipiente y luego usa esa misma agua para regar las plantas.",
-            "No pongas la lavadora si no está llena. Espera a acumular suficiente ropa para aprovechar el ciclo.",
-            "Hoy rechaza cualquier pitillo (popote), bolsa o botella de plástico. Lleva tu propia botella y bolsa.",
-            "Intenta que tu almuerzo no genere residuos no reciclables (usa tupper, cubiertos de metal y servilleta de tela).",
-            "Tómate 10 minutos para verificar si estás separando bien la basura en casa. ¿El reciclaje está limpio y seco?",
-            "Si tienes que comprar comida hoy, intenta comprar al menos un producto sin empaque (fruta suelta, granos a granel).",
-            "Rellena tu propia botella de agua todo el día. No compres agua embotellada.",
-            "Intenta pasar todo el día sin consumir proteína animal. Reduce tu huella de carbono significativamente.",
-            "Investiga qué frutas o verduras están en temporada en tu región y compra una de ellas.",
-            "Crea un plato creativo usando solo lo que ya tienes en la nevera antes de que se dañe. ¡Cero desperdicio de comida!",
-            "Si tomas café fuera, lleva tu propio termo. Si lo haces en casa, usa filtros reutilizables o prensa francesa.",
-            "Antes de comprar algo, mira de dónde viene. Si viajó miles de kilómetros, busca una opción más cercana.",
-            "Si vas a un lugar que está a menos de 2 km, ve caminando o en bicicleta en lugar de usar el carro o transporte público.",
-            "Evita el ascensor hoy. Ahorras energía del edificio y haces ejercicio.",
-            "Si tienes espacio, planta una semilla o cuida las plantas que ya tienes. Si no, riega un árbol de tu calle (si es necesario).",
-            "Si ves un papel o plástico en la calle mientras caminas, recógelo y tíralo en la caneca correcta.",
-            "Lee un artículo corto sobre un problema ambiental local de tu ciudad.",
-            "Busca en tu armario una prenda que no uses y sepárala para donar, en lugar de tirarla.",
-            "Si tienes que imprimir o escribir, asegúrate de usar ambas caras de la hoja.",
-            "Tómate un momento para apreciar la naturaleza que te rodea (un parque, el cielo, un árbol). La conexión es el primer paso para cuidar.",
-            "Entrégale el reciclaje al reciclador de tu barrio."
+            "Hoy pídele al del jugo que NO te dé pitillo.",
+            "Separa ropa que no usas para regalar.",
+            "Báñate en lo que dura una canción (4 min).",
+            "Ve a mercar con tu propia bolsa de tela.",
+            "Arregla ese objeto que llevas postergando.",
+            "Haz un 'calentado' con sobras del almuerzo.",
+            "Desenchufa los cargadores sin uso."
         ];
 
-        // --- LOGICA DEL ARBOL DE DECISIÓN (WIZARD) ---
         const wizardFlow = {
-            start: {
-                question: "¿El objeto todavía funciona o cumple su función?",
-                options: [
-                    { text: "Sí, funciona perfectamente", next: "check_buy" },
-                    { text: "Funciona, pero no lo quiero", next: "check_reuse" },
-                    { text: "No, está roto o dañado", next: "check_repair" }
-                ]
-            },
-            check_buy: {
-                question: "¿Es algo que vas a comprar o ya lo tienes en casa?",
-                options: [
-                    { text: "Lo voy a comprar", next: "result_r0" }, // Rechazar
-                    { text: "Ya lo tengo", next: "result_r1" } // Repensar/Reducir
-                ]
-            },
-            check_reuse: {
-                question: "¿Crees que alguien más (amigo, familiar, fundación) lo podría usar?",
-                options: [
-                    { text: "Sí, está en buen estado", next: "result_r3" }, // Reutilizar
-                    { text: "No, está feo o desgastado", next: "check_restore" }
-                ]
-            },
-            check_restore: {
-                question: "¿Si lo pintaras, limpiaras o arreglaras un poco, te lo quedarías o alguien lo querría?",
-                options: [
-                    { text: "Sí, con una 'manito de gato' aguanta", next: "result_r5" }, // Restaurar
-                    { text: "No, no vale la pena", next: "check_repurpose" }
-                ]
-            },
-            check_repair: {
-                question: "¿Crees que tiene arreglo? (Coser, pegar, cambiar pieza, llevar al técnico)",
-                options: [
-                    { text: "Sí, se puede arreglar", next: "result_r4" }, // Reparar
-                    { text: "No, el daño es grave", next: "check_parts" }
-                ]
-            },
-            check_parts: {
-                question: "¿Tiene partes complejas que sirvan de repuesto? (Motores, chips, piezas buenas)",
-                options: [
-                    { text: "Sí, tiene componentes útiles", next: "result_r6" }, // Remanufacturar
-                    { text: "No, es material simple", next: "check_repurpose" }
-                ]
-            },
-            check_repurpose: {
-                question: "¿Se te ocurre otro uso creativo? (Ej. botella -> matera, ropa vieja -> trapo)",
-                options: [
-                    { text: "Sí, tengo una idea", next: "result_r7" }, // Upcycling
-                    { text: "No, ni idea", next: "result_r8" } // Reciclar
-                ]
-            }
+            start: { question: "¿El objeto todavía funciona o cumple su función?", options: [{ text: "Sí, funciona perfectamente", next: "check_buy" }, { text: "Funciona, pero no lo quiero", next: "check_reuse" }, { text: "No, está roto o dañado", next: "check_repair" }] },
+            check_buy: { question: "¿Es algo que vas a comprar o ya lo tienes en casa?", options: [{ text: "Lo voy a comprar", next: "result_r0" }, { text: "Ya lo tengo", next: "result_r1" }] },
+            check_reuse: { question: "¿Crees que alguien más lo podría usar?", options: [{ text: "Sí, está en buen estado", next: "result_r3" }, { text: "No, está feo o desgastado", next: "check_restore" }] },
+            check_restore: { question: "¿Si lo arreglaras un poco, te lo quedarías o alguien lo querría?", options: [{ text: "Sí, con una 'manito de gato' aguanta", next: "result_r5" }, { text: "No, no vale la pena", next: "check_repurpose" }] },
+            check_repair: { question: "¿Crees que tiene arreglo? (Coser, pegar, cambiar pieza)", options: [{ text: "Sí, se puede arreglar", next: "result_r4" }, { text: "No, el daño es grave", next: "check_parts" }] },
+            check_parts: { question: "¿Tiene partes complejas que sirvan de repuesto?", options: [{ text: "Sí, tiene componentes útiles", next: "result_r6" }, { text: "No, es material simple", next: "check_repurpose" }] },
+            check_repurpose: { question: "¿Se te ocurre otro uso creativo? (Upcycling)", options: [{ text: "Sí, tengo una idea", next: "result_r7" }, { text: "No, ni idea", next: "result_r8" }] }
         };
 
-        // --- COMPONENTE CARRUSEL ---
         const HeroCarousel = () => {
             const slides = [
-                {
-                    title: "Colombia Sostenible",
-                    subtitle: "Nuestra biodiversidad depende de lo que hagas hoy.",
-                    image: "https://images.unsplash.com/photo-1536308037887-165852797016?auto=format&fit=crop&w=1600&q=80",
-                    color: "from-emerald-900/80 to-transparent"
-                },
-                {
-                    title: "¿Basura o Tesoro?",
-                    subtitle: "Aprende a diferenciar antes de botar.",
-                    image: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=1600&q=80",
-                    color: "from-blue-900/80 to-transparent"
-                },
-                {
-                    title: "Compra Local",
-                    subtitle: "Apoya a nuestros campesinos y reduce empaques.",
-                    image: "https://images.unsplash.com/photo-1591191071477-4482d8c9735a?auto=format&fit=crop&w=1600&q=80",
-                    color: "from-orange-900/80 to-transparent"
-                },
-                {
-                    title: "Cuida el Agua",
-                    subtitle: "Cada gota cuenta en nuestros páramos.",
-                    image: "https://images.unsplash.com/photo-1544473244-f6895e6e9b44?auto=format&fit=crop&w=1600&q=80",
-                    color: "from-cyan-900/80 to-transparent"
-                },
-                {
-                    title: "Sin Plástico",
-                    subtitle: "Lleva tu talego, rechaza el pitillo.",
-                    image: "https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?auto=format&fit=crop&w=1600&q=80",
-                    color: "from-green-900/80 to-transparent"
-                },
-                {
-                    title: "Reciclaje Real",
-                    subtitle: "Limpio, seco y en la bolsa blanca.",
-                    image: "https://images.unsplash.com/photo-1604187351574-c75ca79f5807?auto=format&fit=crop&w=1600&q=80",
-                    color: "from-slate-900/80 to-transparent"
-                }
+                { title: "Colombia Sostenible", subtitle: "Nuestra biodiversidad depende de lo que hagas hoy.", image: "https://images.pexels.com/photos/15699963/pexels-photo-15699963.jpeg?auto=compress&cs=tinysrgb&w=1600" },
+                { title: "¿Basura o Tesoro?", subtitle: "Aprende a diferenciar antes de botar.", image: "https://images.pexels.com/photos/3951381/pexels-photo-3951381.jpeg?auto=compress&cs=tinysrgb&w=1600" },
+                { title: "Compra Local", subtitle: "Apoya a nuestros campesinos y reduce empaques.", image: "https://images.pexels.com/photos/2733918/pexels-photo-2733918.jpeg?auto=compress&cs=tinysrgb&w=1600" },
+                { title: "Compostaje en Casa", subtitle: "Transforma tus residuos orgánicos en vida.", image: "https://images.pexels.com/photos/3050720/pexels-photo-3050720.jpeg?auto=compress&cs=tinysrgb&w=1600" }
             ];
 
             const [current, setCurrent] = useState(0);
 
             useEffect(() => {
-                const timer = setInterval(() => {
-                    setCurrent((prev) => (prev + 1) % slides.length);
-                }, 5000);
+                const timer = setInterval(() => setCurrent(p => (p + 1) % slides.length), 6000);
                 return () => clearInterval(timer);
             }, [slides.length]);
 
-            const nextSlide = () => setCurrent((current + 1) % slides.length);
-            const prevSlide = () => setCurrent((current - 1 + slides.length) % slides.length);
-
             return (
-                <div className="relative w-full h-[400px] md:h-[480px] overflow-hidden rounded-3xl shadow-2xl mb-12 group">
+                <div className="relative w-full h-[450px] md:h-[550px] overflow-hidden rounded-[2rem] shadow-2xl mb-10 mt-6 group">
                     {slides.map((slide, index) => (
-                        <div 
-                            key={index}
-                            className={`absolute inset-0 transition-all duration-1000 ease-in-out ${index === current ? 'opacity-100 scale-100' : 'opacity-0 scale-105'}`}
-                        >
-                            <div 
-                                className="absolute inset-0 bg-cover bg-center"
-                                style={{ backgroundImage: `url('${slide.image}')` }}
-                            />
-                            <div className={`absolute inset-0 bg-gradient-to-r ${slide.color}`}></div>
+                        <div key={index} className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === current ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}>
+                            <div className="absolute inset-0 bg-cover bg-center transition-transform duration-[10000ms] ease-out scale-105"
+                                 style={{ backgroundImage: `url('${slide.image}')`, transform: index === current ? 'scale(1)' : 'scale(1.1)' }} />
+                            {/* Overlay Gradient suave */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent"></div>
                             
-                            <div className="relative z-10 h-full flex flex-col justify-center px-8 md:px-16 text-white max-w-3xl">
-                                <h2 className="text-5xl md:text-7xl font-black mb-6 drop-shadow-lg leading-tight tracking-tight animate-in slide-in-from-left duration-1000">{slide.title}</h2>
-                                <div className="h-2 w-24 bg-white/50 mb-6 rounded-full"></div>
-                                <p className="text-xl md:text-3xl font-light opacity-95 drop-shadow-md animate-in fade-in duration-1000 delay-300">{slide.subtitle}</p>
+                            <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16 text-white max-w-5xl mx-auto flex flex-col justify-end h-full">
+                                <h2 className="text-5xl md:text-7xl font-black mb-4 drop-shadow-lg tracking-tight animate-in slide-up">
+                                    {slide.title}
+                                </h2>
+                                <p className="text-xl md:text-3xl font-light text-slate-200 drop-shadow-md animate-in fade-in" style={{animationDelay: '0.2s'}}>
+                                    {slide.subtitle}
+                                </p>
                             </div>
                         </div>
                     ))}
                     
-                    <div className="absolute bottom-8 right-8 flex gap-4">
-                        <button onClick={prevSlide} className="bg-white/10 hover:bg-white/30 text-white p-4 rounded-full backdrop-blur-md transition-all border border-white/20 shadow-lg hover:scale-110">
-                            <Icons.ChevronLeft size={28} />
-                        </button>
-                        <button onClick={nextSlide} className="bg-white/10 hover:bg-white/30 text-white p-4 rounded-full backdrop-blur-md transition-all border border-white/20 shadow-lg hover:scale-110">
-                            <Icons.ChevronRight size={28} />
-                        </button>
-                    </div>
-
-                    <div className="absolute bottom-8 left-8 md:left-16 flex gap-2">
+                    {/* Navigation Dots */}
+                    <div className="absolute bottom-8 right-8 md:right-16 z-20 flex gap-2">
                         {slides.map((_, idx) => (
-                            <div 
-                                key={idx} 
-                                onClick={() => setCurrent(idx)}
-                                className={`h-2 rounded-full transition-all cursor-pointer shadow-sm ${idx === current ? 'bg-white w-12' : 'bg-white/40 w-3 hover:bg-white/80'}`} 
-                            />
+                            <button key={idx} onClick={() => setCurrent(idx)}
+                                className={`h-2 rounded-full transition-all duration-300 ${idx === current ? 'w-12 bg-emerald-400' : 'w-4 bg-white/50 hover:bg-white/80'}`} />
                         ))}
                     </div>
                 </div>
             );
         };
 
-        // --- COMPONENTE TRIVIA ---
-        const TriviaGame = () => {
-            const [currentQIndex, setCurrentQIndex] = useState(0);
-            const [score, setScore] = useState(0);
-            const [showResult, setShowResult] = useState(false);
-            const [selectedOption, setSelectedOption] = useState(null);
-            const [isAnswered, setIsAnswered] = useState(false);
-
-            const currentQ = triviaData[currentQIndex];
-
-            const handleAnswer = (index) => {
-                if (isAnswered) return;
-                setSelectedOption(index);
-                setIsAnswered(true);
-                if (index === currentQ.correct) {
-                    setScore(score + 1);
-                }
-            };
-
-            const nextQuestion = () => {
-                if (currentQIndex < triviaData.length - 1) {
-                    setCurrentQIndex(currentQIndex + 1);
-                    setSelectedOption(null);
-                    setIsAnswered(false);
-                } else {
-                    setShowResult(true);
-                }
-            };
-
-            const resetGame = () => {
-                setCurrentQIndex(0);
-                setScore(0);
-                setShowResult(false);
-                setSelectedOption(null);
-                setIsAnswered(false);
-            };
-
-            if (showResult) {
-                let message = "";
-                // Escala para 20 preguntas
-                if (score >= 18) message = "¡Maestro del Reciclaje! 🏆";
-                else if (score >= 10) message = "¡Vas por buen camino! 🌱";
-                else message = "¡Sigue aprendiendo! 📚";
-
-                return (
-                    <div className="max-w-2xl mx-auto bg-white p-10 rounded-3xl shadow-xl text-center animate-in slide-up border border-slate-100">
-                        <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <Icons.Award size={48} className="text-emerald-600" />
+        const BentoCards = ({ dailyChallenge, generateChallenge }) => (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                {/* Challenge Card */}
+                <div className="md:col-span-2 glass-panel rounded-[2rem] p-8 md:p-10 relative overflow-hidden group flex flex-col justify-center min-h-[280px]">
+                    <div className="absolute inset-0 bg-cover bg-center opacity-10 mix-blend-multiply group-hover:scale-105 transition-transform duration-700" 
+                         style={{ backgroundImage: "url('https://images.pexels.com/photos/3850512/pexels-photo-3850512.jpeg?auto=compress&cs=tinysrgb&w=1600')" }}></div>
+                    
+                    <div className="relative z-10">
+                        <div className="flex items-center gap-4 mb-6">
+                            <div className="bg-emerald-100 p-3 rounded-2xl text-emerald-600 shadow-sm">
+                                <Icons.Zap size={28} className="fill-emerald-200" />
+                            </div>
+                            <h3 className="text-2xl font-bold text-slate-800 tracking-tight">Reto Eco-Diario</h3>
                         </div>
-                        <h2 className="text-3xl font-black text-slate-800 mb-2">Resultados</h2>
-                        <p className="text-xl text-emerald-600 font-bold mb-6">{message}</p>
-                        <p className="text-6xl font-black text-slate-800 mb-8">{score} / {triviaData.length}</p>
-                        <button 
-                            onClick={resetGame}
-                            className="bg-slate-900 text-white px-8 py-3 rounded-full font-bold hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2 mx-auto"
-                        >
-                            <Icons.RefreshCcw size={20} /> Intentar de nuevo
+                        <p className="text-3xl text-slate-700 mb-8 font-medium leading-tight max-w-xl">
+                            {dailyChallenge || "¿Te le mides a un reto sostenible hoy?"}
+                        </p>
+                        <button onClick={generateChallenge} className="bg-slate-900 text-white px-8 py-3.5 rounded-full font-semibold hover:bg-emerald-600 transition-colors flex items-center gap-3 w-fit shadow-lg shadow-slate-900/20 active:scale-95">
+                            <Icons.RefreshCcw size={20} className={dailyChallenge ? "animate-spin-once" : ""} />
+                            {dailyChallenge ? "Dame otro reto" : "Generar Reto"}
                         </button>
                     </div>
-                );
-            }
-
-            return (
-                <div className="max-w-3xl mx-auto animate-in slide-up">
-                    <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
-                        <div className="bg-slate-900 text-white p-6 flex justify-between items-center">
-                            <span className="font-bold text-emerald-400">Pregunta {currentQIndex + 1} de {triviaData.length}</span>
-                            <div className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full">
-                                <Icons.Star size={16} className="text-yellow-400 fill-current" />
-                                <span>Puntos: {score}</span>
-                            </div>
-                        </div>
-                        
-                        <div className="p-8 md:p-12">
-                            <h3 className="text-2xl font-bold text-slate-800 mb-8 leading-tight">{currentQ.question}</h3>
-                            
-                            <div className="space-y-4 mb-8">
-                                {currentQ.options.map((opt, idx) => {
-                                    let btnClass = "w-full text-left p-5 rounded-2xl border-2 transition-all font-medium text-lg flex justify-between items-center ";
-                                    if (isAnswered) {
-                                        if (idx === currentQ.correct) btnClass += "bg-emerald-50 border-emerald-500 text-emerald-800 ";
-                                        else if (idx === selectedOption) btnClass += "bg-red-50 border-red-500 text-red-800 ";
-                                        else btnClass += "bg-white border-slate-100 opacity-50 ";
-                                    } else {
-                                        btnClass += "bg-white border-slate-200 hover:border-emerald-400 hover:shadow-md cursor-pointer text-slate-700 ";
-                                    }
-
-                                    return (
-                                        <button 
-                                            key={idx} 
-                                            onClick={() => handleAnswer(idx)}
-                                            disabled={isAnswered}
-                                            className={btnClass}
-                                        >
-                                            {opt}
-                                            {isAnswered && idx === currentQ.correct && <Icons.CheckCircle className="text-emerald-600" />}
-                                            {isAnswered && idx === selectedOption && idx !== currentQ.correct && <Icons.XCircle className="text-red-600" />}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-
-                            {isAnswered && (
-                                <div className={`p-6 rounded-2xl mb-8 border ${selectedOption === currentQ.correct ? 'bg-emerald-50 border-emerald-100' : 'bg-red-50 border-red-100'}`}>
-                                    <p className={`font-bold ${selectedOption === currentQ.correct ? 'text-emerald-800' : 'text-red-800'}`}>
-                                        {selectedOption === currentQ.correct ? currentQ.feedback : currentQ.wrongFeedback}
-                                    </p>
-                                </div>
-                            )}
-
-                            {isAnswered && (
-                                <div className="text-right">
-                                    <button 
-                                        onClick={nextQuestion}
-                                        className="bg-emerald-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-emerald-700 transition-colors inline-flex items-center gap-2"
-                                    >
-                                        {currentQIndex < triviaData.length - 1 ? "Siguiente Pregunta" : "Ver Resultados"} <Icons.ArrowRight size={20} />
-                                    </button>
-                                </div>
-                            )}
+                </div>
+                
+                {/* Fact Card */}
+                <div className="glass-panel rounded-[2rem] p-8 md:p-10 flex flex-col justify-center relative overflow-hidden min-h-[280px] bg-gradient-to-br from-emerald-600 to-teal-800 text-white border-none shadow-xl shadow-emerald-900/20">
+                    <Icons.Leaf className="absolute -bottom-10 -right-10 w-64 h-64 opacity-10 rotate-12" />
+                    <div className="relative z-10">
+                        <span className="text-emerald-200 text-xs font-bold uppercase tracking-widest mb-3 block">Dato Rápido</span>
+                        <h4 className="text-6xl font-black mb-2 tracking-tighter">12M</h4>
+                        <p className="font-medium text-lg text-emerald-50 leading-tight mb-4">Toneladas de basura al año en Colombia.</p>
+                        <div className="bg-black/20 backdrop-blur-md px-4 py-2 rounded-xl inline-block text-sm font-semibold border border-white/10">
+                            Solo reciclamos el 17%
                         </div>
                     </div>
                 </div>
-            );
-        };
+            </div>
+        );
 
-        // --- COMPONENTE PRINCIPAL APP ---
         function App() {
             const [activeTab, setActiveTab] = useState('explore'); 
-            
-            // Estados para Wizard
             const [wizardCurrentNode, setWizardCurrentNode] = useState('start');
             const [wizardFinished, setWizardFinished] = useState(false);
             const [wizardResult, setWizardResult] = useState(null);
-
-            // Estados para Detalle y Tips Interactivos
             const [selectedR, setSelectedR] = useState(null);
             const [completedTips, setCompletedTips] = useState({});
-
             const [searchTerm, setSearchTerm] = useState("");
             const [dailyChallenge, setDailyChallenge] = useState(null);
 
             const filteredRs = rData.filter(item => 
                 item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                item.examples.some(ex => ex.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                item.description.toLowerCase().includes(searchTerm.toLowerCase())
+                (item.examples || []).some(ex => ex.toLowerCase().includes(searchTerm.toLowerCase()))
             );
 
-            const generateChallenge = () => {
-                const random = dailyChallenges[Math.floor(Math.random() * dailyChallenges.length)];
-                setDailyChallenge(random);
-            };
-
-            const toggleTip = (rId, tipIndex) => {
-                const key = `${rId}-${tipIndex}`;
-                setCompletedTips(prev => ({
-                    ...prev,
-                    [key]: !prev[key]
-                }));
-            };
-
-            // --- LÓGICA DEL ASISTENTE ---
+            const generateChallenge = () => setDailyChallenge(dailyChallenges[Math.floor(Math.random() * dailyChallenges.length)]);
+            const toggleTip = (rId, i) => setCompletedTips(p => ({ ...p, [`${rId}-${i}`]: !p[`${rId}-${i}`] }));
+            
             const handleWizardOption = (nextStep) => {
                 if (nextStep.startsWith('result_')) {
-                    const rId = nextStep.replace('result_', '');
-                    const resultData = rData.find(r => r.id === rId);
-                    
-                    setWizardResult({
-                        status: 'success',
-                        data: resultData
-                    });
+                    setWizardResult({ status: 'success', data: rData.find(r => r.id === nextStep.replace('result_', '')) });
                     setWizardFinished(true);
-                } else {
-                    setWizardCurrentNode(nextStep);
-                }
+                } else setWizardCurrentNode(nextStep);
             };
 
-            const resetWizard = () => {
-                setWizardCurrentNode('start');
-                setWizardFinished(false);
-                setWizardResult(null);
-            };
-
-            // Helper para renderizar iconos dinámicamente desde el string
             const RenderIcon = ({ name, size = 24, className = "" }) => {
                 const IconComponent = Icons[name] || Icons.HelpCircle;
                 return <IconComponent size={size} className={className} />;
             };
 
             return (
-                <div className="min-h-screen bg-slate-50 font-sans text-slate-800 p-4 md:p-8">
+                <div className="min-h-screen p-4 md:p-8 relative z-10">
                     <div className="max-w-7xl mx-auto">
-                        
                         <HeroCarousel />
+                        <BentoCards dailyChallenge={dailyChallenge} generateChallenge={generateChallenge} />
 
-                        {/* Reto Diario y Dato Impactante */}
-                        <div className="mb-12 grid grid-cols-1 md:grid-cols-4 gap-6">
-                            <div className="md:col-span-3 bg-white rounded-3xl p-8 border border-slate-100 shadow-xl relative overflow-hidden flex flex-col justify-center">
-                                <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-50 rounded-full -translate-y-1/2 translate-x-1/2 opacity-50"></div>
-                                <div className="relative z-10">
-                                <div className="flex items-center gap-3 mb-4">
-                                    <div className="bg-yellow-100 p-2 rounded-lg text-yellow-600">
-                                        <Icons.Zap size={24} className="fill-current" />
-                                    </div>
-                                    <h3 className="text-2xl font-bold text-slate-800">EcoReto (Diario)</h3>
-                                </div>
-                                <p className="text-xl text-slate-600 mb-6 leading-relaxed">
-                                    {dailyChallenge ? dailyChallenge : "¿Te le mides a un reto sostenible hoy?"}
-                                </p>
-                                <button 
-                                    onClick={generateChallenge}
-                                    className="bg-slate-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-emerald-600 transition-colors flex items-center gap-2 w-fit shadow-lg shadow-slate-200"
-                                >
-                                    <Icons.RefreshCcw size={18} />
-                                    {dailyChallenge ? "Dame otro reto" : "Generar Reto"}
-                                </button>
-                                </div>
-                            </div>
+                        {/* Main Glass Container */}
+                        <div className="glass-panel rounded-[2.5rem] p-4 md:p-8 mb-12">
                             
-                            <div className="bg-gradient-to-br from-red-500 to-rose-600 p-8 rounded-3xl shadow-xl text-white flex flex-col justify-center relative overflow-hidden">
-                                <div className="absolute -bottom-4 -right-4 w-32 h-32 opacity-20 rotate-12">
-                                    <Icons.Trash2 size={128} />
-                                </div>
-                                <span className="text-white/80 text-xs font-bold uppercase tracking-widest mb-2">Dato de Impacto</span>
-                                <h4 className="text-5xl font-black mb-1">12M</h4>
-                                <p className="font-medium text-lg opacity-95 leading-tight mb-2">Toneladas de basura al año en Colombia.</p>
-                                <p className="text-lg bg-white/20 p-2 rounded-lg mt-2 inline-block backdrop-blur-sm">¡Solo reciclamos el 17%!</p>
-                            </div>
-                        </div>
-
-                        {/* Contenedor Principal */}
-                        <div className="bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-slate-100">
-                        
-                            {/* Navegación Estilizada */}
-                            <div className="flex flex-col md:flex-row border-b border-gray-100">
-                                <button 
-                                onClick={() => setActiveTab('explore')}
-                                className={`flex-1 py-6 text-center font-bold text-lg transition-all flex items-center justify-center gap-3 ${activeTab === 'explore' ? 'text-emerald-700 bg-emerald-50/50 border-b-4 border-emerald-500' : 'text-gray-400 hover:text-emerald-600 hover:bg-gray-50'}`}
-                                >
-                                <Icons.Lightbulb className={activeTab === 'explore' ? "fill-current" : ""} size={24} />
-                                Explorar las 9R
-                                </button>
-                                <button 
-                                onClick={() => setActiveTab('wizard')}
-                                className={`flex-1 py-6 text-center font-bold text-lg transition-all flex items-center justify-center gap-3 ${activeTab === 'wizard' ? 'text-emerald-700 bg-emerald-50/50 border-b-4 border-emerald-500' : 'text-gray-400 hover:text-emerald-600 hover:bg-gray-50'}`}
-                                >
-                                <Icons.HelpCircle className={activeTab === 'wizard' ? "fill-current" : ""} size={24} />
-                                Asistente de Decisión
-                                </button>
-                                <button 
-                                onClick={() => setActiveTab('trivia')}
-                                className={`flex-1 py-6 text-center font-bold text-lg transition-all flex items-center justify-center gap-3 ${activeTab === 'trivia' ? 'text-emerald-700 bg-emerald-50/50 border-b-4 border-emerald-500' : 'text-gray-400 hover:text-emerald-600 hover:bg-gray-50'}`}
-                                >
-                                <Icons.Brain className={activeTab === 'trivia' ? "fill-current" : ""} size={24} />
-                                Eco-Trivia
-                                </button>
+                            {/* Floating Nav */}
+                            <div className="flex flex-col md:flex-row bg-slate-100/50 p-2 rounded-full mb-10 max-w-3xl mx-auto">
+                                {[
+                                    { id: 'explore', label: 'Explorar', icon: 'Search' },
+                                    { id: 'wizard', label: 'Asistente', icon: 'HelpCircle' },
+                                    { id: 'trivia', label: 'Trivia', icon: 'Brain' }
+                                ].map((tab) => (
+                                    <button 
+                                        key={tab.id} onClick={() => setActiveTab(tab.id)}
+                                        className={`flex-1 py-3 px-6 text-center font-semibold text-base transition-all duration-300 flex items-center justify-center gap-2 rounded-full ${
+                                            activeTab === tab.id 
+                                            ? 'bg-white text-slate-900 shadow-md scale-100' 
+                                            : 'text-slate-500 hover:text-slate-800 hover:bg-white/40'
+                                        }`}
+                                    >
+                                        <RenderIcon name={tab.icon} size={18} className={activeTab === tab.id ? "text-emerald-500" : ""} />
+                                        {tab.label}
+                                    </button>
+                                ))}
                             </div>
 
-                            <div className="p-6 md:p-12 bg-slate-50/50 min-h-[600px]">
-                                
-                                {/* PESTAÑA: EXPLORAR */}
+                            <div className="min-h-[500px]">
+                                {/* EXPLORE TAB */}
                                 {activeTab === 'explore' && (
-                                <div className="animate-in fade-in duration-500">
+                                <div className="animate-in fade-in">
                                     {!selectedR ? (
                                     <>
-                                        <div className="flex flex-col lg:flex-row items-end justify-between mb-10 gap-6">
-                                        <div className="text-left max-w-2xl">
-                                            <h2 className="text-4xl font-black text-slate-800 mb-4 tracking-tight">La Escalera de la Sostenibilidad (Economía Circular)</h2>
-                                            <p className="text-slate-500 text-lg leading-relaxed">Cada paso cuenta. Empieza desde arriba (Rechazar) y ve bajando hasta llegar al reciclaje solo si es necesario.</p>
-                                        </div>
-                                        
-                                        <div className="relative w-full lg:w-96">
-                                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                                                <Icons.Search size={20} />
+                                        <div className="flex flex-col md:flex-row items-center justify-between mb-10 gap-6 px-4">
+                                            <div>
+                                                <h2 className="text-3xl font-black text-slate-800 tracking-tight">La Escalera Circular</h2>
+                                                <p className="text-slate-500 font-medium mt-1">Nueve formas de salvar el planeta, de mayor a menor impacto.</p>
                                             </div>
-                                            <input 
-                                            type="text" 
-                                            placeholder="Buscar (ej. icopor, ropa...)" 
-                                            value={searchTerm}
-                                            onChange={(e) => setSearchTerm(e.target.value)}
-                                            className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-2xl focus:ring-4 focus:ring-emerald-100 focus:border-emerald-500 focus:outline-none transition-shadow shadow-sm text-lg"
-                                            />
-                                        </div>
+                                            <div className="relative w-full md:w-80 group">
+                                                <Icons.Search size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500" />
+                                                <input type="text" placeholder="Buscar (ej. plástico...)" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
+                                                    className="w-full pl-12 pr-4 py-3 bg-white/50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all outline-none text-slate-700 shadow-sm backdrop-blur-md"
+                                                />
+                                            </div>
                                         </div>
 
-                                        {filteredRs.length === 0 ? (
-                                        <div className="text-center py-20 opacity-50 bg-white rounded-3xl border border-dashed border-slate-300">
-                                            <div className="mx-auto mb-4 text-slate-300 w-16 h-16 flex items-center justify-center">
-                                                <Icons.Leaf size={64} />
-                                            </div>
-                                            <p className="text-xl font-medium">No encontramos resultados para "{searchTerm}"</p>
-                                            <button onClick={() => setSearchTerm("")} className="text-emerald-600 font-bold mt-2 hover:underline">Limpiar búsqueda</button>
-                                        </div>
-                                        ) : (
-                                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                             {filteredRs.map((item) => (
-                                            <div 
-                                                key={item.id} 
-                                                onClick={() => setSelectedR(item)}
-                                                className={`${item.color} group relative p-8 rounded-[2rem] cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl border-2 hover:border-black/5 flex flex-col h-full`}
-                                            >
-                                                <div className={`absolute top-0 right-0 px-4 py-2 rounded-bl-2xl rounded-tr-2xl ${item.headerColor} text-white font-bold text-xs tracking-wider uppercase shadow-sm`}>
-                                                {item.english}
+                                            <div key={item.id} onClick={() => setSelectedR(item)} className="glass-card rounded-[2rem] p-8 cursor-pointer flex flex-col group relative overflow-hidden h-full">
+                                                <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${item.color} opacity-10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2`}></div>
+                                                
+                                                <div className="flex justify-between items-start mb-6">
+                                                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center bg-gradient-to-br ${item.color} shadow-lg shadow-${item.color.split('-')[1]}/30 text-white transform group-hover:scale-110 transition-transform duration-300`}>
+                                                        <RenderIcon name={item.icon} size={28} />
+                                                    </div>
+                                                    <span className={`text-xs font-bold uppercase tracking-widest ${item.textDark} bg-${item.color.split('-')[1]}-50 px-3 py-1 rounded-full`}>
+                                                        {item.english}
+                                                    </span>
                                                 </div>
                                                 
-                                                <div className="mb-6 mt-2">
-                                                <div className="bg-white w-20 h-20 rounded-2xl flex items-center justify-center shadow-md group-hover:rotate-6 transition-transform duration-300">
-                                                    <RenderIcon name={item.icon} size={40} className="opacity-90" />
-                                                </div>
-                                                </div>
+                                                <h3 className="text-2xl font-black text-slate-800 mb-2 tracking-tight">{item.name.split(': ')[1]}</h3>
+                                                <p className="text-slate-600 font-medium mb-6 flex-grow text-sm leading-relaxed">{item.description}</p>
                                                 
-                                                <h3 className="text-3xl font-black mb-2 tracking-tight">{item.name.split(':')[1]}</h3>
-                                                <div className="h-1.5 w-12 bg-current opacity-20 mb-4 rounded-full"></div>
-                                                <p className="text-base font-medium opacity-80 mb-8 flex-grow leading-relaxed">{item.description}</p>
-                                                
-                                                {searchTerm && (
-                                                <div className="bg-white/60 backdrop-blur-sm p-3 rounded-xl text-sm mb-6 border border-white/50">
-                                                    <span className="font-bold">Encontrado:</span> {item.examples.find(ex => ex.toLowerCase().includes(searchTerm.toLowerCase()))}
-                                                </div>
+                                                {searchTerm && (item.examples || []).some(ex => ex.toLowerCase().includes(searchTerm.toLowerCase())) && (
+                                                    <div className="bg-white/60 p-3 rounded-xl text-xs mb-4 shadow-sm border border-white/50 text-slate-600">
+                                                        <span className="font-bold text-emerald-600">Ejemplo:</span> {(item.examples || []).find(ex => ex.toLowerCase().includes(searchTerm.toLowerCase()))}
+                                                    </div>
                                                 )}
 
-                                                <div className="mt-auto flex items-center text-sm font-extrabold opacity-70 group-hover:opacity-100 transition-opacity uppercase tracking-wide">
-                                                <Icons.Info size={18} className="mr-2" />
-                                                Ver Guía Completa
-                                                <div className="ml-auto transform group-hover:translate-x-2 transition-transform">
-                                                    <Icons.ArrowRight size={18} />
-                                                </div>
+                                                <div className="mt-auto flex items-center text-sm font-bold text-slate-400 group-hover:text-slate-800 transition-colors">
+                                                    <span>Explorar guía</span>
+                                                    <Icons.ArrowRight size={16} className="ml-2 transform group-hover:translate-x-1 transition-transform" />
                                                 </div>
                                             </div>
                                             ))}
                                         </div>
-                                        )}
                                     </>
                                     ) : (
-                                    // MODAL DE DETALLE
-                                    <div className="max-w-5xl mx-auto animate-in zoom-in-95 duration-300">
-                                        <button 
-                                        onClick={() => setSelectedR(null)}
-                                        className="mb-8 flex items-center text-slate-500 hover:text-emerald-700 font-bold text-lg transition-colors group"
-                                        >
-                                        <div className="bg-white p-2 rounded-full shadow-sm mr-3 group-hover:shadow-md transition-shadow">
-                                            <Icons.ChevronLeft size={24} /> 
-                                        </div>
-                                        Volver al listado
+                                    <div className="animate-in slide-up">
+                                        <button onClick={() => setSelectedR(null)} className="mb-6 flex items-center text-slate-500 hover:text-slate-800 font-semibold px-4 py-2 bg-white/50 rounded-full shadow-sm w-fit hover:bg-white transition-all">
+                                            <Icons.ChevronLeft size={18} className="mr-1" /> Volver
                                         </button>
 
-                                        <div className="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-100">
-                                        <div className={`${selectedR.headerColor} p-10 md:p-16 text-white relative overflow-hidden`}>
-                                            <div className="absolute -right-12 -bottom-12 w-80 h-80 opacity-10 rotate-12">
-                                                <RenderIcon name={selectedR.icon} size={320} />
-                                            </div>
-                                            <div className="relative z-10">
-                                                <span className="opacity-80 font-bold tracking-widest uppercase mb-2 block">{selectedR.english}</span>
-                                                <h2 className="text-5xl md:text-7xl font-black mb-4 tracking-tight">{selectedR.name}</h2>
-                                            </div>
-                                        </div>
-                                        
-                                        <div className="p-8 md:p-12 grid grid-cols-1 lg:grid-cols-12 gap-12">
-                                            {/* COLUMNA IZQUIERDA (INFO) */}
-                                            <div className="lg:col-span-7">
-                                            <h3 className="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-3">
-                                                <div className="bg-emerald-100 p-2 rounded-lg text-emerald-600"><Icons.Info size={20} /></div>
-                                                Concepto Clave
-                                            </h3>
-                                            <p className="text-slate-600 leading-relaxed text-xl mb-10 border-l-4 border-emerald-500 pl-6">{selectedR.longDescription}</p>
-                                            
-                                            <h3 className="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3">
-                                                <div className="bg-yellow-100 p-2 rounded-lg text-yellow-600"><Icons.Star size={20} /></div>
-                                                Beneficios
-                                            </h3>
-                                            <div className="grid grid-cols-1 gap-4 mb-10">
-                                                {selectedR.benefits.map((b, i) => (
-                                                <div key={i} className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-emerald-200 transition-colors group">
-                                                    <div className="min-w-8 h-8 rounded-full bg-white border border-emerald-100 flex items-center justify-center text-emerald-600 font-bold shadow-sm group-hover:scale-110 transition-transform">✓</div>
-                                                    <span className="text-slate-700 font-medium text-lg">{b}</span>
-                                                </div>
-                                                ))}
-                                            </div>
-
-                                            <h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-3">
-                                                <div className="bg-orange-100 p-2 rounded-lg text-orange-600"><Icons.Lightbulb size={20} /></div>
-                                                Ejemplos Reales
-                                            </h3>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                {selectedR.examples.map((ex, i) => (
-                                                <div key={i} className="flex items-start gap-3 text-slate-600 text-sm bg-slate-50 p-3 rounded-xl">
-                                                    <div className="min-w-1.5 h-1.5 rounded-full bg-orange-400 mt-2"></div>
-                                                    {ex}
-                                                </div>
-                                                ))}
-                                            </div>
-                                            </div>
-                                            
-                                            {/* COLUMNA DERECHA (INTERACTIVA) */}
-                                            <div className="lg:col-span-5 flex flex-col h-full">
-                                            <div className="bg-slate-50 p-8 rounded-[2rem] border border-slate-200 h-full shadow-inner">
-                                                <h3 className="text-xl font-bold text-slate-800 mb-2 flex items-center gap-3">
-                                                <Icons.CheckCircle className="text-emerald-600" size={24} /> 
-                                                Checklist de Acción
-                                                </h3>
-                                                <p className="text-slate-500 mb-8">Marca lo que ya aplicas en tu día a día:</p>
+                                        <div className="glass-card rounded-[2.5rem] overflow-hidden border-0 shadow-2xl">
+                                            {/* Hero Image Section */}
+                                            <div className="relative h-64 md:h-80 w-full overflow-hidden">
+                                                <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('${selectedR.image}')` }} />
+                                                <div className={`absolute inset-0 bg-gradient-to-r ${selectedR.color} opacity-80 mix-blend-multiply`}></div>
+                                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 to-transparent"></div>
                                                 
-                                                <div className="space-y-4">
-                                                {selectedR.tips.map((tip, i) => {
-                                                    const isDone = completedTips[`${selectedR.id}-${i}`];
-                                                    return (
-                                                    <div 
-                                                        key={i} 
-                                                        onClick={() => toggleTip(selectedR.id, i)}
-                                                        className={`
-                                                        cursor-pointer p-5 rounded-2xl border-2 transition-all duration-300 flex items-start gap-4 group
-                                                        ${isDone 
-                                                            ? 'bg-emerald-600 border-emerald-600 shadow-lg scale-[1.02]' 
-                                                            : 'bg-white border-transparent shadow-sm hover:border-emerald-300 hover:shadow-md'}
-                                                        `}
-                                                    >
-                                                        <div className={`
-                                                        w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors mt-0.5
-                                                        ${isDone ? 'bg-white border-white' : 'border-slate-300 group-hover:border-emerald-400'}
-                                                        `}>
-                                                        {isDone && <Icons.Check size={14} className="text-emerald-600 stroke-[3]" />}
-                                                        </div>
-                                                        <div>
-                                                        <p className={`font-medium transition-colors text-lg ${isDone ? 'text-white' : 'text-slate-700'}`}>
-                                                            {tip}
-                                                        </p>
+                                                <div className="absolute bottom-0 left-0 p-8 md:p-12 text-white">
+                                                    <div className="flex items-center gap-3 mb-3">
+                                                        <RenderIcon name={selectedR.icon} size={24} className={selectedR.textLight} />
+                                                        <span className={`font-bold tracking-widest uppercase text-sm ${selectedR.textLight}`}>{selectedR.english}</span>
+                                                    </div>
+                                                    <h2 className="text-4xl md:text-6xl font-black tracking-tight drop-shadow-md">{selectedR.name}</h2>
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="p-8 md:p-12 grid grid-cols-1 lg:grid-cols-2 gap-12 bg-white/40">
+                                                <div className="space-y-8">
+                                                    <div>
+                                                        <h3 className="text-xl font-bold text-slate-800 mb-3 flex items-center gap-2"><Icons.Info size={20} className="text-slate-400"/> Concepto</h3>
+                                                        <p className="text-slate-600 leading-relaxed text-lg">{selectedR.longDescription}</p>
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2"><Icons.Star size={20} className="text-yellow-500 fill-current"/> Beneficios</h3>
+                                                        <ul className="space-y-3">
+                                                            {(selectedR.benefits || []).map((b, i) => (
+                                                                <li key={i} className="flex items-start gap-3 text-slate-700 font-medium bg-white/60 p-4 rounded-xl shadow-sm border border-white">
+                                                                    <Icons.CheckCircle size={20} className="text-emerald-500 shrink-0 mt-0.5" /> {b}
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2"><Icons.Lightbulb size={20} className="text-orange-500 fill-current"/> Ejemplos Reales</h3>
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                            {(selectedR.examples || []).map((ex, i) => (
+                                                                <div key={i} className="flex items-start gap-3 p-3 bg-white/60 rounded-xl shadow-sm border border-white">
+                                                                    <div className="min-w-2 h-2 rounded-full bg-orange-400 mt-2"></div>
+                                                                    <span className="text-slate-700 text-sm font-medium">{ex}</span>
+                                                                </div>
+                                                            ))}
                                                         </div>
                                                     </div>
-                                                    );
-                                                })}
                                                 </div>
                                                 
-                                                <div className="mt-auto pt-8">
-                                                <div className="text-center p-6 bg-white rounded-2xl border border-dashed border-slate-300">
-                                                    <p className="text-sm text-slate-500 italic font-medium">"El cambio empieza con una sola acción."</p>
-                                                </div>
+                                                <div className="bg-slate-50/80 rounded-[2rem] p-8 border border-white shadow-inner flex flex-col">
+                                                    <h3 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2"><Icons.Check size={20} className="text-emerald-500 stroke-[3]"/> Checklist de Acción</h3>
+                                                    <div className="space-y-3 relative z-10 flex-grow">
+                                                        {(selectedR.tips || []).map((tip, i) => {
+                                                            const isDone = completedTips[`${selectedR.id}-${i}`];
+                                                            return (
+                                                                <div key={i} onClick={() => toggleTip(selectedR.id, i)} className={`cursor-pointer p-4 rounded-xl transition-all duration-300 flex items-center gap-4 border ${isDone ? 'bg-emerald-500 border-emerald-400 shadow-md text-white' : 'bg-white border-white shadow-sm text-slate-700 hover:border-emerald-200'}`}>
+                                                                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${isDone ? 'border-white bg-white/20' : 'border-slate-300'}`}>
+                                                                        {isDone && <Icons.Check size={14} className="text-white stroke-[4]" />}
+                                                                    </div>
+                                                                    <p className="font-semibold">{tip}</p>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
                                                 </div>
                                             </div>
-                                            </div>
-                                        </div>
                                         </div>
                                     </div>
                                     )}
                                 </div>
                                 )}
 
-                                {/* PESTAÑA: ASISTENTE MEJORADO (SIN CATEGORIAS) */}
+                                {}
+                                {/* WIZARD TAB */}
                                 {activeTab === 'wizard' && (
-                                <div className="max-w-4xl mx-auto animate-in slide-in-from-right duration-500">
+                                <div className="max-w-3xl mx-auto animate-in fade-in py-8">
                                     {!wizardFinished ? (
-                                    <div className="text-center py-8 relative max-w-2xl mx-auto">
-                                        
+                                    <div className="text-center relative">
                                         {wizardCurrentNode !== 'start' && (
-                                        <button 
-                                            onClick={resetWizard}
-                                            className="absolute top-0 left-0 text-slate-400 hover:text-slate-800 flex items-center gap-2 text-sm font-bold bg-white px-4 py-2 rounded-full shadow-sm hover:shadow-md transition-all"
-                                        >
-                                            <Icons.ChevronLeft size={16} /> Volver al inicio
-                                        </button>
-                                        )}
-
-                                        <div className="mb-10 inline-block mt-12">
-                                        <div className="relative">
-                                            <div className="absolute inset-0 bg-emerald-200 rounded-full blur-xl opacity-50 animate-pulse"></div>
-                                            <div className="bg-white border-8 border-emerald-50 rounded-full p-8 shadow-2xl relative z-10">
-                                                <Icons.HelpCircle size={64} className="text-emerald-600" />
-                                            </div>
-                                        </div>
-                                        </div>
-                                        
-                                        <h2 className="text-4xl font-black text-slate-800 mb-6 tracking-tight">
-                                        Decisión Sostenible
-                                        </h2>
-                                        
-                                        <div className="bg-white p-8 rounded-3xl shadow-xl shadow-slate-200/50 mb-10 border border-slate-50">
-                                        <p className="text-2xl text-slate-700 font-medium leading-relaxed">
-                                            {wizardFlow[wizardCurrentNode] ? wizardFlow[wizardCurrentNode].question : "Cargando..."}
-                                        </p>
-                                        </div>
-
-                                        <div className="grid grid-cols-1 gap-4">
-                                        {wizardFlow[wizardCurrentNode]?.options.map((option, idx) => (
-                                            <button 
-                                            key={idx}
-                                            onClick={() => handleWizardOption(option.next)}
-                                            className="group bg-white hover:bg-emerald-600 hover:text-white text-slate-600 border-2 border-slate-200 hover:border-emerald-600 px-8 py-5 rounded-2xl font-bold text-xl transition-all shadow-sm hover:shadow-lg flex items-center justify-between text-left"
-                                            >
-                                            <span>{option.text}</span>
-                                            <div className="w-6 h-6 opacity-0 group-hover:opacity-100 transform -translate-x-2 group-hover:translate-x-0 transition-all">
-                                                <Icons.ArrowRight size={24} />
-                                            </div>
+                                            <button onClick={() => setWizardCurrentNode('start')} className="absolute -top-10 left-0 text-slate-500 hover:text-slate-800 text-sm font-semibold flex items-center gap-1">
+                                                <Icons.RotateCcw size={16} /> Reiniciar
                                             </button>
-                                        ))}
+                                        )}
+                                        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-emerald-100 to-teal-100 text-teal-600 mb-8 shadow-inner">
+                                            <Icons.Brain size={40} />
+                                        </div>
+                                        <h2 className="text-3xl font-black text-slate-800 mb-10 tracking-tight">
+                                            {wizardFlow[wizardCurrentNode]?.question}
+                                        </h2>
+                                        <div className="grid gap-4">
+                                            {(wizardFlow[wizardCurrentNode]?.options || []).map((opt, idx) => (
+                                                <button key={idx} onClick={() => handleWizardOption(opt.next)} className="glass-card w-full p-6 rounded-2xl text-left font-bold text-xl text-slate-700 hover:text-slate-900 flex justify-between items-center group">
+                                                    {opt.text}
+                                                    <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-emerald-100 group-hover:text-emerald-600 transition-colors">
+                                                        <Icons.ArrowRight size={20} />
+                                                    </div>
+                                                </button>
+                                            ))}
                                         </div>
                                     </div>
                                     ) : (
-                                    // RESULTADO FINAL
-                                    <div className="bg-white border border-slate-100 rounded-[2.5rem] p-10 md:p-16 text-center shadow-2xl relative overflow-hidden animate-in zoom-in duration-300 max-w-3xl mx-auto">
-                                        {wizardResult?.data && (
-                                        <>
-                                            <div className={`absolute top-0 left-0 w-full h-6 ${wizardResult.data.color.split(' ')[0]}`}></div>
+                                    <div className="glass-card rounded-[3rem] p-10 md:p-16 text-center shadow-2xl relative overflow-hidden animate-in zoom-in-95">
+                                        <div className={`absolute top-0 left-0 w-full h-3 bg-gradient-to-r ${wizardResult.data.color}`}></div>
+                                        <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-slate-50 text-slate-800 mb-6 shadow-md border border-white">
+                                            <RenderIcon name={wizardResult.data.icon} size={48} className={wizardResult.data.textDark} />
+                                        </div>
+                                        <h2 className="text-4xl font-black text-slate-800 mb-2">¡Aplica la {wizardResult.data.name.split(':')[0]}!</h2>
+                                        <p className="text-xl text-slate-500 font-medium mb-8 uppercase tracking-widest">{wizardResult.data.name.split(':')[1]}</p>
+                                        
+                                        <div className="bg-white/60 p-6 rounded-2xl mb-8 border border-white text-left">
+                                            <p className="text-lg text-slate-700 font-medium mb-4">{wizardResult.data.description}</p>
                                             
-                                            <div className={`inline-flex items-center justify-center w-32 h-32 rounded-full mb-8 shadow-2xl ${wizardResult.data.color}`}>
-                                            <RenderIcon name={wizardResult.data.icon} size={64} />
-                                            </div>
-                                            
-                                            <h2 className="text-5xl font-black text-slate-800 mb-2 tracking-tight">¡Solución Encontrada!</h2>
-                                            <h3 className="text-2xl text-emerald-600 font-bold mb-8 uppercase tracking-widest">{wizardResult.data.name}</h3>
-                                            
-                                            <p className="text-2xl text-slate-600 mb-10 leading-relaxed font-light">{wizardResult.data.longDescription}</p>
-                                            
-                                            <div className="bg-slate-50 p-8 rounded-3xl mb-10 text-left border border-slate-200 shadow-inner">
-                                            <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2 text-lg">
-                                                <Icons.Lightbulb size={24} className="text-yellow-500 fill-current" /> Consejo Práctico:
-                                            </h4>
-                                            <p className="text-slate-600 mb-8 text-lg">{wizardResult.data.description}</p>
-                                            
-                                            <h4 className="font-bold text-slate-800 mb-4 text-xs uppercase tracking-widest">Pilas con esto:</h4>
+                                            <h4 className="font-black text-slate-500 text-sm uppercase tracking-widest border-b border-slate-200/50 pb-2 mb-3">Pilas con esto (Tips):</h4>
                                             <ul className="space-y-3">
-                                                {wizardResult.data.tips?.map((tip, i) => (
-                                                <li key={i} className="text-slate-600 flex items-start gap-3 bg-white p-3 rounded-xl shadow-sm border border-slate-100">
-                                                    <div className="min-w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 font-bold text-xs mt-0.5">!</div>
+                                                {(wizardResult.data.tips || []).map((tip, i) => (
+                                                <li key={i} className="text-slate-600 flex items-start gap-3 font-medium text-sm">
+                                                    <div className="min-w-5 h-5 bg-emerald-400 rounded-full flex items-center justify-center text-white font-bold text-xs mt-0.5 shadow-sm">!</div>
                                                     {tip}
                                                 </li>
                                                 ))}
                                             </ul>
-                                            </div>
-                                        </>
-                                        )}
-
-                                        <button 
-                                        onClick={resetWizard}
-                                        className="bg-slate-900 hover:bg-black text-white px-10 py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 mx-auto shadow-xl hover:scale-105"
-                                        >
-                                        <Icons.RotateCcw className="w-5 h-5" />
-                                        Analizar otro objeto
+                                        </div>
+                                        
+                                        <button onClick={() => {setWizardCurrentNode('start'); setWizardFinished(false);}} className="bg-slate-900 text-white px-8 py-4 rounded-full font-bold shadow-lg hover:bg-slate-800 transition-colors active:scale-95">
+                                            Analizar otro objeto
                                         </button>
                                     </div>
                                     )}
                                 </div>
                                 )}
 
-                                {/* PESTAÑA: TRIVIA */}
+                                {/* TRIVIA TAB */}
                                 {activeTab === 'trivia' && (
-                                    <TriviaGame />
+                                    <div className="max-w-2xl mx-auto animate-in fade-in py-8">
+                                        <div className="glass-card rounded-[2.5rem] p-8 shadow-xl">
+                                            <div className="flex justify-between items-center mb-8 pb-6 border-b border-slate-200/50">
+                                                <h3 className="text-2xl font-black text-slate-800 flex items-center gap-2"><Icons.Award className="text-emerald-500"/> Eco-Trivia</h3>
+                                                <span className="bg-slate-100 text-slate-600 font-bold px-4 py-1.5 rounded-full text-sm">Pregunta al azar</span>
+                                            </div>
+                                            <p className="text-xl font-bold text-slate-700 mb-8 leading-relaxed text-center">
+                                                {triviaData[0].question}
+                                            </p>
+                                            <div className="space-y-3">
+                                                {triviaData[0].options.map((opt, i) => (
+                                                    <button key={i} className="w-full p-4 rounded-xl bg-white/60 border border-white text-slate-700 font-semibold text-lg hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-700 transition-all text-left shadow-sm">
+                                                        {opt}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
                                 )}
-
                             </div>
                         </div>
 
-                        {/* Footer */}
-                        <div className="mt-12 text-center pb-8">
-                            <p className="text-slate-400 font-medium">Hecho con 💚 para una Colombia más limpia - Pastoral y Bienestar Institucional UCN</p>
+                        {}
+                        <div className="text-center py-6 text-slate-400 font-medium text-sm">
+                            <p>Diseñado con 💚 para Colombia. Interfaz Glassmorphism.</p>
                         </div>
-
                     </div>
                 </div>
             );
